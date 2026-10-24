@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1512" height="256" viewBox="0 0 1512 256" role="img" aria-label="Decisionary LinkedIn company cover">
+<defs><pattern id="grid" width="90" height="90" patternUnits="userSpaceOnUse"><path d="M90 0H0V90" fill="none" stroke="#226052" stroke-width=".7" opacity=".32"/></pattern><clipPath id="frame"><rect width="1512" height="256"/></clipPath></defs>
+<rect width="1512" height="256" fill="#081e1b"/><rect width="1512" height="256" fill="url(#grid)"/>
+<g clip-path="url(#frame)" stroke="#4eab80" stroke-width="1.6" opacity=".44" fill="none">
+<circle cx="1410" cy="128" r="116"/><circle cx="1410" cy="128" r="188"/><circle cx="1410" cy="128" r="264"/><circle cx="1410" cy="128" r="341"/>
+</g>
+<rect x="84" y="76" width="107" height="107" rx="17" fill="#081e1b" stroke="#9ce1be" stroke-width="2"/>
+<text x="137" y="165" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="100" font-style="italic" fill="#c9f1da">d</text>
+<text x="232" y="77" font-family="Arial,Helvetica,sans-serif" font-size="19" font-weight="700" letter-spacing="1.2" fill="#a1d8bb">DECISIONARY / SOFTWARE DELIVERY</text>
+<text x="232" y="155" font-family="Arial,Helvetica,sans-serif" font-size="48" font-weight="700" letter-spacing="-1.8" fill="#effaf3">Custom Software. One Accountable Partner.</text>
+<text x="232" y="209" font-family="Arial,Helvetica,sans-serif" font-size="19" font-weight="700" letter-spacing="1.1" fill="#b2dbbf">DEVELOPMENT · DELIVERY · SOUTH KOREA</text>
+</svg>
