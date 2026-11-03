@@ -45,6 +45,7 @@
   function mailto(subject) { return 'mailto:' + MAIL + '?subject=' + encodeURIComponent(subject); }
 
   function renderDynamic() {
+    stopFx();
     $$('[data-mail-case]').forEach(function (a) {
       var id = a.dataset.mailCase;
       a.href = mailto('[' + tr('c' + id + '_ind') + '] ' + tr('h_caseSubj') + ' | Decisionary');
@@ -64,81 +65,112 @@
     $$('[data-ref-note]').forEach(function (n) { n.hidden = cur === 'en' || cur === 'ko'; });
     // languages written without spaces leave some hero word slots empty
     $$('.hero h1 .w').forEach(function (w) { w.hidden = !w.textContent.trim(); });
+    refreshFx();
   }
 
   // ---------- motion: typed headings and counting numbers ----------
+  // Each heading/number waits (text hidden, number at its start value) until it reaches the
+  // upper three quarters of the viewport and stays there briefly, then plays. When it leaves
+  // the viewport completely it is reset, so it plays again on the next visit.
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var running = [];
-  function stopFx() { var r = running; running = []; r.forEach(function (fin) { fin(); }); }
+  var items = [];
   function graphemes(s) {
     if (window.Intl && Intl.Segmenter) return Array.from(new Intl.Segmenter(cur, { granularity: 'grapheme' }).segment(s), function (x) { return x.segment; });
     return Array.from(s);
   }
-  function typewriter(el) {
-    var full = el.textContent;
-    if (!full.trim()) return;
-    var parts = graphemes(full);
-    var i = 0;
-    var step = Math.max(18, Math.min(55, 900 / parts.length));
-    var hadLabel = el.hasAttribute('aria-label');
-    if (!hadLabel) el.setAttribute('aria-label', full);
-    var on = document.createElement('span');
-    var off = document.createElement('span');
-    on.className = 'tw-on'; off.className = 'tw-off';
-    on.setAttribute('aria-hidden', 'true'); off.setAttribute('aria-hidden', 'true');
-    el.textContent = '';
-    el.appendChild(on); el.appendChild(off);
-    var render = function () { on.textContent = parts.slice(0, i).join(''); off.textContent = parts.slice(i).join(''); };
-    render();
-    var timer = setInterval(function () { i++; render(); if (i >= parts.length) finish(); }, step);
-    function finish() {
-      clearInterval(timer);
-      el.textContent = full;
-      if (!hadLabel) el.removeAttribute('aria-label');
-      running = running.filter(function (f) { return f !== finish; });
-    }
-    running.push(finish);
+  function halt(it) {
+    if (it.timer) { clearInterval(it.timer); it.timer = 0; }
+    if (it.raf) { cancelAnimationFrame(it.raf); it.raf = 0; }
   }
-  function countUp(el) {
-    var full = el.textContent;
-    var m = full.match(/^(\D*)(\d+)(.*)$/);
-    if (!m) return;
-    var to = Number(m[2]);
-    var prev = el.previousElementSibling ? (el.previousElementSibling.textContent.match(/\d+/) || [])[0] : null;
-    var from = prev ? Number(prev) : 0;
-    if (to - from < 2) return;
-    var start = 0, raf = 0;
-    function tick(now) {
-      if (!start) start = now;
-      var p = Math.min(1, (now - start) / 1400);
-      var eased = 1 - Math.pow(1 - p, 3);
-      el.textContent = m[1] + Math.round(from + (to - from) * eased) + m[3];
-      if (p < 1) raf = requestAnimationFrame(tick); else finish();
-    }
-    function finish() {
-      cancelAnimationFrame(raf);
-      el.textContent = full;
-      running = running.filter(function (f) { return f !== finish; });
-    }
-    el.textContent = m[1] + from + m[3];
-    raf = requestAnimationFrame(tick);
-    running.push(finish);
+  function restore(it) {
+    halt(it);
+    if (it.full != null) it.el.textContent = it.full;
+    if (it.label) { it.el.removeAttribute('aria-label'); it.label = false; }
+    it.el.classList.remove('tw-wait');
   }
+  function prime(it) {
+    halt(it);
+    var el = it.el;
+    var full = el.textContent;
+    it.full = full;
+    it.state = 'done';
+    if (it.kind === 'type') {
+      if (!full.trim()) return;
+      if (!el.hasAttribute('aria-label')) { el.setAttribute('aria-label', full); it.label = true; }
+      it.on = document.createElement('span');
+      it.off = document.createElement('span');
+      it.on.className = 'tw-on'; it.off.className = 'tw-off';
+      it.on.setAttribute('aria-hidden', 'true'); it.off.setAttribute('aria-hidden', 'true');
+      it.off.textContent = full;
+      el.textContent = '';
+      el.appendChild(it.on); el.appendChild(it.off);
+      el.classList.add('tw-wait');
+    } else {
+      var m = full.match(/^(\D*)(\d+)(.*)$/);
+      if (!m) return;
+      var prev = el.previousElementSibling ? (el.previousElementSibling.textContent.match(/\d+/) || [])[0] : null;
+      it.m = m; it.to = Number(m[2]); it.from = prev ? Number(prev) : 0;
+      if (it.to - it.from < 2) return;
+      el.textContent = m[1] + it.from + m[3];
+    }
+    it.state = 'primed';
+  }
+  function play(it) {
+    if (it.state !== 'primed') return;
+    it.state = 'running';
+    var el = it.el;
+    if (it.kind === 'type') {
+      el.classList.remove('tw-wait');
+      var parts = graphemes(it.full), i = 0;
+      var step = Math.max(22, Math.min(60, 1100 / parts.length));
+      it.timer = setInterval(function () {
+        i++;
+        it.on.textContent = parts.slice(0, i).join('');
+        it.off.textContent = parts.slice(i).join('');
+        if (i >= parts.length) { restore(it); it.state = 'done'; }
+      }, step);
+    } else {
+      var start = 0;
+      var tick = function (now) {
+        if (!start) start = now;
+        var p = Math.min(1, (now - start) / 1600);
+        var eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = it.m[1] + Math.round(it.from + (it.to - it.from) * eased) + it.m[3];
+        if (p < 1) it.raf = requestAnimationFrame(tick); else { it.raf = 0; restore(it); it.state = 'done'; }
+      };
+      it.raf = requestAnimationFrame(tick);
+    }
+  }
+  // before text changes (language, contact toggle): show final text; waiting items are re-primed afterwards
+  function stopFx() {
+    items.forEach(function (it) {
+      if (it.state === 'running') { restore(it); it.state = 'done'; }
+      else if (it.state === 'primed') { restore(it); it.state = 'reprime'; }
+    });
+  }
+  function refreshFx() { items.forEach(function (it) { if (it.state === 'reprime') prime(it); }); }
   var fxStarted = false;
   function startFx() {
     if (fxStarted) return;
     fxStarted = true;
     if (reduceMotion || !('IntersectionObserver' in window)) return;
-    var typed = $$('.chap-n b, .chap h2, .page-head h1, .cta h2');
-    var counted = $$('.fig-n em');
-    var io = new IntersectionObserver(function (entries) {
+    $$('.chap-n b, .chap h2, .page-head h1, .cta h2').forEach(function (el) { items.push({ el: el, kind: 'type' }); });
+    $$('.fig-n em').forEach(function (el) { items.push({ el: el, kind: 'count' }); });
+    items.forEach(function (it) { it.el._fx = it; prime(it); });
+    var trigger = new IntersectionObserver(function (entries) {
       entries.forEach(function (en) {
-        if (!en.isIntersecting) return;
-        io.unobserve(en.target);
-        if (en.target.matches('.fig-n em')) countUp(en.target); else typewriter(en.target);
+        var it = en.target._fx;
+        clearTimeout(it.dwell);
+        if (en.isIntersecting) it.dwell = setTimeout(function () { play(it); }, 120);
       });
-    }, { threshold: 0.6 });
-    typed.concat(counted).forEach(function (el) { io.observe(el); });
+    }, { rootMargin: '0px 0px -25% 0px', threshold: 0 });
+    var leave = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        var it = en.target._fx;
+        if (!en.isIntersecting && it.state === 'done') prime(it);
+      });
+    }, { threshold: 0 });
+    items.forEach(function (it) { trigger.observe(it.el); leave.observe(it.el); });
   }
 
   function apply() {
