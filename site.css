@@ -68,6 +68,10 @@ main[id],section[id],article[id]{scroll-margin-top:84px}
   .rv{animation:rv linear both;animation-timeline:view();animation-range:entry 0% entry 40%}
 }
 @keyframes rv{from{opacity:0;transform:translateY(34px)}to{opacity:1;transform:none}}
+.tw-off{visibility:hidden}
+.tw-off::before{content:"";visibility:visible;display:inline-block;width:.07em;min-width:2px;height:.85em;margin:0 .04em 0 .02em;vertical-align:-.08em;background:var(--acc);animation:caret .9s steps(1) infinite}
+@keyframes caret{50%{opacity:0}}
+.fig-n{font-variant-numeric:tabular-nums}
 @keyframes drop{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
 
 /* buttons and links */
