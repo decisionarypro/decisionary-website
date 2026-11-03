@@ -177,7 +177,7 @@ const ko={
   "founder_bio1": "학습 플랫폼, 보험, 모빌리티, B2B SaaS, 공공 서비스 분야에서 제품 기획과 개발 실행을 이끌었습니다.",
   "founder_bio2": "복잡한 업무 요구사항을 출시 가능한 범위로 정리하고, 출시까지 여러 직군의 팀을 조율합니다.",
   "founder_linkedin": "대표 링크드인 보기",
-  "founder_name": "Seoksoo Ko",
+  "founder_name": "고석수",
   "founder_role": "Decisionary 대표",
   "hero_cta": "프로젝트 상담하기",
   "hero_cta2": "서비스 살펴보기",
