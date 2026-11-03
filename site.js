@@ -66,7 +66,83 @@
     $$('.hero h1 .w').forEach(function (w) { w.hidden = !w.textContent.trim(); });
   }
 
+  // ---------- motion: typed headings and counting numbers ----------
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var running = [];
+  function stopFx() { var r = running; running = []; r.forEach(function (fin) { fin(); }); }
+  function graphemes(s) {
+    if (window.Intl && Intl.Segmenter) return Array.from(new Intl.Segmenter(cur, { granularity: 'grapheme' }).segment(s), function (x) { return x.segment; });
+    return Array.from(s);
+  }
+  function typewriter(el) {
+    var full = el.textContent;
+    if (!full.trim()) return;
+    var parts = graphemes(full);
+    var i = 0;
+    var step = Math.max(18, Math.min(55, 900 / parts.length));
+    var hadLabel = el.hasAttribute('aria-label');
+    if (!hadLabel) el.setAttribute('aria-label', full);
+    var on = document.createElement('span');
+    var off = document.createElement('span');
+    on.className = 'tw-on'; off.className = 'tw-off';
+    on.setAttribute('aria-hidden', 'true'); off.setAttribute('aria-hidden', 'true');
+    el.textContent = '';
+    el.appendChild(on); el.appendChild(off);
+    var render = function () { on.textContent = parts.slice(0, i).join(''); off.textContent = parts.slice(i).join(''); };
+    render();
+    var timer = setInterval(function () { i++; render(); if (i >= parts.length) finish(); }, step);
+    function finish() {
+      clearInterval(timer);
+      el.textContent = full;
+      if (!hadLabel) el.removeAttribute('aria-label');
+      running = running.filter(function (f) { return f !== finish; });
+    }
+    running.push(finish);
+  }
+  function countUp(el) {
+    var full = el.textContent;
+    var m = full.match(/^(\D*)(\d+)(.*)$/);
+    if (!m) return;
+    var to = Number(m[2]);
+    var prev = el.previousElementSibling ? (el.previousElementSibling.textContent.match(/\d+/) || [])[0] : null;
+    var from = prev ? Number(prev) : 0;
+    if (to - from < 2) return;
+    var start = 0, raf = 0;
+    function tick(now) {
+      if (!start) start = now;
+      var p = Math.min(1, (now - start) / 1400);
+      var eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = m[1] + Math.round(from + (to - from) * eased) + m[3];
+      if (p < 1) raf = requestAnimationFrame(tick); else finish();
+    }
+    function finish() {
+      cancelAnimationFrame(raf);
+      el.textContent = full;
+      running = running.filter(function (f) { return f !== finish; });
+    }
+    el.textContent = m[1] + from + m[3];
+    raf = requestAnimationFrame(tick);
+    running.push(finish);
+  }
+  var fxStarted = false;
+  function startFx() {
+    if (fxStarted) return;
+    fxStarted = true;
+    if (reduceMotion || !('IntersectionObserver' in window)) return;
+    var typed = $$('.chap-n b, .chap h2, .page-head h1, .cta h2');
+    var counted = $$('.fig-n em');
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        io.unobserve(en.target);
+        if (en.target.matches('.fig-n em')) countUp(en.target); else typewriter(en.target);
+      });
+    }, { threshold: 0.6 });
+    typed.concat(counted).forEach(function (el) { io.observe(el); });
+  }
+
   function apply() {
+    stopFx();
     textNodes.forEach(function (n) { n.textContent = tr(n.dataset.i18n); });
     ariaNodes.forEach(function (n) { n.setAttribute('aria-label', tr(n.dataset.i18nAria)); });
     var tk = document.body.dataset.titleKey;
@@ -87,6 +163,7 @@
       cur = l;
       if (save) { try { localStorage.setItem(STORE, l); } catch (e) {} }
       apply();
+      startFx();
     };
     if (l === 'en') { dict = {}; return done(); }
     if (cache[l]) { dict = cache[l]; return done(); }
@@ -189,6 +266,7 @@
   // ---------- contact: business or agency ----------
   $$('[data-who]').forEach(function (b) {
     b.addEventListener('click', function () {
+      stopFx();
       who = b.dataset.who;
       $$('[data-who]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
       renderDynamic();
