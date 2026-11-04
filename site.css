@@ -459,3 +459,4 @@ a,button,summary,label{touch-action:manipulation}
 .lp-related ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px 28px}
 .lp-related a{display:inline-flex;align-items:center;gap:8px;min-height:44px;font-weight:500;color:inherit;text-underline-offset:4px}
 .cs-act .tl{margin-left:20px}
+.page-updated{font-size:12px;margin:-12px 0 28px}
