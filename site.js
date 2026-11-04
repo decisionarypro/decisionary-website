@@ -89,7 +89,7 @@
     // case buttons open the inquiry form; the hidden "case" field records which case it came from
     $$('[data-form-case]').forEach(function (a) {
       var id = a.dataset.formCase;
-      var label = id === 'scope' ? 'scope-definition' : id + ' ' + tr('c' + id + '_ind');
+      var label = id === 'scope' ? 'scope-definition' : /^\d+$/.test(id) ? id + ' ' + tr('c' + id + '_ind') : id;
       a.href = formHref('case=' + encodeURIComponent(label));
     });
     $$('[data-form]').forEach(function (a) { a.href = formHref(); });
