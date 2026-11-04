@@ -246,7 +246,7 @@
 "p_s3_h": "Penyimpanan data dan permintaan",
 "p_s3_p": "Informasi pertanyaan disimpan selama satu tahun sejak diterima, lalu dihapus. Jika berlanjut menjadi kontrak, catatan terkait disimpan selama jangka waktu yang diwajibkan hukum. Untuk meminta akses, koreksi, atau penghapusan, kirim email ke ",
 "p_s4_h": "Penyedia layanan dan pemrosesan di luar negeri",
-"p_s4_p": "Kami menggunakan dua penyedia untuk menerima pertanyaan: Tally untuk formulir (data disimpan di Uni Eropa) dan Cal.com untuk penjadwalan panggilan (diproses di Amerika Serikat). Karena kami berbasis di Korea Selatan, informasi Anda juga dapat ditangani di Korea Selatan dan oleh penyedia email Anda.",
+"p_s4_p": "Kami menggunakan tiga penyedia untuk menerima dan mengelola pertanyaan: Tally untuk formulir (data disimpan di Uni Eropa), Cal.com untuk penjadwalan panggilan (diproses di Amerika Serikat), dan Notion untuk menyimpan catatan pertanyaan (diproses di Amerika Serikat). Karena kami berbasis di Korea Selatan, informasi Anda juga dapat ditangani di Korea Selatan dan oleh penyedia email Anda.",
 "p_s5_after": "",
 "p_s5_h": "Kontak",
 "p_s5_p": "Decisionary · ",
