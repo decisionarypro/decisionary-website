@@ -228,7 +228,7 @@
     };
     if (l === 'en') { dict = {}; return done(); }
     if (cache[l]) { dict = cache[l]; return done(); }
-    fetch('/i18n/' + l + '.json', { cache: 'force-cache' })
+    fetch('/i18n/' + l + '.json?v=' + (document.documentElement.dataset.v || ''), { cache: 'force-cache' })
       .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(function (d) { cache[l] = d; dict = d; done(); })
       .catch(function () { dict = {}; l = 'en'; done(); });
