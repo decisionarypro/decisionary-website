@@ -434,8 +434,8 @@ a,button,summary,label{touch-action:manipulation}
 @media (max-width:1000px){.scope{grid-template-columns:minmax(0,1fr);gap:28px;padding:32px}}
 @media (max-width:640px){
   .scope{padding:24px}
-  .m-cta{display:inline-flex;position:fixed;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:30;min-height:52px;box-shadow:0 12px 30px -10px rgba(0,0,0,.45);transform:translateY(160%);transition:transform .25s var(--ease-out)}
-  .mcta-on .m-cta{transform:none}
+  .m-cta{display:inline-flex;position:fixed;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:30;min-height:52px;box-shadow:0 12px 30px -10px rgba(0,0,0,.45);transform:translateY(calc(100% + 32px + env(safe-area-inset-bottom)));opacity:0;visibility:hidden;pointer-events:none;transition:transform .25s var(--ease-out),opacity .2s ease,visibility 0s linear .25s}
+  .mcta-on .m-cta{transform:none;opacity:1;visibility:visible;pointer-events:auto;transition:transform .25s var(--ease-out),opacity .2s ease,visibility 0s}
   .mcta-on .foot{padding-bottom:96px}
 }
 @media (prefers-reduced-motion:reduce){.m-cta{transition:none}}
