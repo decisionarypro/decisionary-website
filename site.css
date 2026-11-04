@@ -442,3 +442,20 @@ a,button,summary,label{touch-action:manipulation}
 /* even out short last lines (2026-11-04 wrap audit) */
 .lede,.cta-lede,.hero-sub p,.vs-t,.cell-m,.scope-terms{text-wrap:balance}
 .cell-m{display:block}
+/* search landing pages (2026-11-04) */
+.card-more{align-self:flex-start;margin-top:20px;min-height:44px;font-size:15px;color:var(--light)}
+.crumbs{display:flex;flex-wrap:wrap;gap:8px;font-size:12px}
+.crumbs a{color:inherit;text-underline-offset:3px}
+.page-head .crumbs+h1{margin-top:20px}
+.lp-body .cs-block{max-width:880px}
+.lp-body .cs-block h2{font-size:clamp(22px,2.2vw,32px);margin-bottom:16px}
+.lp-body .cs-block p,.lp-body .cs-block ul{font-size:17px}
+.lp-body ol.cs-outs{list-style:none;margin:8px 0 0;padding:0;border-top:1px solid var(--line-l);max-width:68ch}
+.lp-note{font-size:14px!important;margin-top:16px}
+.lp-h{font-size:clamp(30px,4.2vw,64px);margin-bottom:32px}
+.cjk .lp-h,.l-th .lp-h{font-size:clamp(28px,3.6vw,54px)}
+.lp-related{margin-top:56px}
+.lp-related h2{font-size:12px;margin-bottom:12px}
+.lp-related ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px 28px}
+.lp-related a{display:inline-flex;align-items:center;gap:8px;min-height:44px;font-weight:500;color:inherit;text-underline-offset:4px}
+.cs-act .tl{margin-left:20px}
