@@ -1,0 +1,51 @@
+# Decisionary
+
+> Decisionary (디시저너리) is a custom software development company in Seoul, South Korea. It works with businesses and digital agencies on web applications, platform rebuilds and API integrations. Scope and acceptance criteria are agreed in writing before the build, and the founder leads delivery.
+
+Last updated: 2026-11-04
+
+## Who it is for
+
+- Companies that need a web application, an admin or internal system, or a rebuild of an existing platform, and want the scope fixed before development starts
+- Insurers, general agencies and insurtech teams building sign-up flows, partner API channels and admin tools
+- Digital agencies that need a white-label development partner: work is delivered under the agency's name, and the agency keeps or hands over the client relationship
+
+## Services
+
+- [Custom web applications](https://decisionarypro.com/web-applications.html): customer portals, B2B platforms, admin and back-office systems, internal tools
+- [Platform rebuilds](https://decisionarypro.com/platform-rebuild.html): staged rebuilds and data migration while the current platform keeps running
+- [API and system integration](https://decisionarypro.com/api-integration.html): partner APIs, core and legacy systems, payment and settlement flows
+- [Insurtech development](https://decisionarypro.com/insurtech.html): insurance sign-up flows, embedded and partner channels, admin tools
+- [Development partner for agencies](https://decisionarypro.com/agency-partner.html): white-label delivery, help scoping a client brief before the agency quotes
+
+## How an engagement works
+
+1. Free review of the brief; the founder replies within one business day
+2. Optional paid scope definition (one to two weeks): requirements, screen and feature list, acceptance criteria and a fixed estimate. The fee is credited in full if the build goes ahead, and the client owns the deliverables
+3. Fixed-price contract for the agreed scope; payment by milestone is also available
+4. Delivery against the written acceptance criteria, then operating handover
+
+Prices are discussed after reviewing the brief and are not published.
+
+## Track record
+
+The results below are from projects the founder led in previous roles and contracts. Client names are confidential. Details: [case studies](https://decisionarypro.com/cases.html).
+
+- B2B2C insurance sales platform (2018–2019): sign-up conversion from 12% to 28%; average sign-up time from 8 to 3 minutes; about 1,200 new customers through the partner API channel
+- Mobility app rebuild: 36 candidate features narrowed to 15; shipped in 66 days, about 27% ahead of plan; crash rate from 4.2% to 0.8%
+- Translation management SaaS: project admin time down about 40%; on-time delivery at 95%
+- Global learning platform prepared for launch in about 100 countries: three-stage data migration strategy and load-test criteria for 20,000 users
+- Mobile consumer service: monthly active users up 42%; retention up 28 percentage points; app rating from 3.2 to 4.6
+- Public-sector tourism kiosk: won the tender with the top technical evaluation score
+
+## Languages
+
+The site is available in English, Korean, Japanese, Simplified and Traditional Chinese, Vietnamese, Thai, Indonesian and Malay. Service pages are in English, Korean and Japanese. Korean: https://decisionarypro.com/ko/ · Japanese: https://decisionarypro.com/ja/
+
+## Contact
+
+- Inquiry form: https://tally.so/r/Nqr1lN
+- Book a 30-minute call: https://cal.com/decisionary/project-call
+- Email: hello@decisionarypro.com
+- LinkedIn: https://www.linkedin.com/company/decisionarypro/
+- Privacy policy: https://decisionarypro.com/privacy.html
