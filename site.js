@@ -6,6 +6,8 @@
   var CJK = ['ko', 'ja', 'zh-Hans', 'zh-Hant'];
   var STORE = 'decisionary-lang';
   var MAIL = 'hello@decisionarypro.com';
+  // inquiry forms on Tally; languages without their own form use the English one
+  var FORMS = { ko: 'https://tally.so/r/2jXGag', ja: 'https://tally.so/r/q5L1D8', en: 'https://tally.so/r/Nqr1lN' };
   var root = document.documentElement;
   var $ = function (s, c) { return (c || document).querySelector(s); };
   var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
@@ -50,6 +52,7 @@
       var id = a.dataset.mailCase;
       a.href = mailto('[' + tr('c' + id + '_ind') + '] ' + tr('h_caseSubj') + ' | Decisionary');
     });
+    $$('[data-form]').forEach(function (a) { a.href = FORMS[cur] || FORMS.en; });
     var title = $('#cta-title');
     if (title) {
       var ag = who === 'agency';
