@@ -386,6 +386,37 @@
     if (contactEl) barIO.observe(contactEl);
   }
 
+  // ---------- visit statistics (Umami, cookie-free; no personal data in any value) ----------
+  var LOCS = [['.m-cta', 'mobile-bar'], ['.hdr', 'header'], ['.overlay', 'menu'], ['.hero', 'hero'], ['.page-head', 'top'],
+    ['.scope-sec', 'scope'], ['[data-case-panel]', 'case'], ['.cs-act', 'case'], ['.lp-body', 'body'], ['#contact', 'contact'], ['.foot', 'footer']];
+  function where(el) {
+    for (var i = 0; i < LOCS.length; i++) if (el.closest(LOCS[i][0])) return LOCS[i][1];
+    return 'other';
+  }
+  function track(name, data) {
+    try { if (window.umami && typeof window.umami.track === 'function') window.umami.track(name, data); } catch (e) {}
+  }
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest('a, button');
+    if (!el) return;
+    if (el.matches('[data-form], [data-form-case]')) {
+      track('inquiry_click', { location: where(el), case: el.dataset.formCase || '', src: SRC || 'none' });
+    } else if (el.matches('a[href^="https://cal.com/"]')) {
+      track('booking_click', { location: where(el) });
+    } else if (el.matches('a[href^="mailto:"]')) {
+      track('email_click', { location: where(el) });
+    } else if (el.matches('[data-who]')) {
+      track('audience_toggle', { who: el.dataset.who });
+    } else if (el.matches('[data-open-case]')) {
+      track('case_open', { case: el.dataset.openCase, from: 'figure' });
+    } else if (el.matches('[data-case]') && el.getAttribute('aria-expanded') === 'true') {
+      // the cell's own handler has just opened it
+      track('case_open', { case: el.dataset.case, from: 'tab' });
+    } else if (el.matches('[data-lang]')) {
+      track('language_select', { to: el.dataset.lang, from: PAGE_LANG });
+    }
+  });
+
   // the page is already rendered in its language; wire up dynamic text and effects
   cur = PAGE_LANG;
   dict = {};
