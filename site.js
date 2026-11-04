@@ -137,7 +137,7 @@
       var start = 0;
       var tick = function (now) {
         if (!start) start = now;
-        var p = Math.min(1, (now - start) / 1600);
+        var p = Math.min(1, (now - start) / 1100);
         var eased = 1 - Math.pow(1 - p, 3);
         el.textContent = it.m[1] + Math.round(it.from + (it.to - it.from) * eased) + it.m[3];
         if (p < 1) it.raf = requestAnimationFrame(tick); else { it.raf = 0; restore(it); it.state = 'done'; }
@@ -168,13 +168,8 @@
         if (en.isIntersecting) it.dwell = setTimeout(function () { play(it); }, 120);
       });
     }, { rootMargin: '0px 0px -25% 0px', threshold: 0 });
-    var leave = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) {
-        var it = en.target._fx;
-        if (!en.isIntersecting && it.state === 'done') prime(it);
-      });
-    }, { threshold: 0 });
-    items.forEach(function (it) { trigger.observe(it.el); leave.observe(it.el); });
+    // each effect plays once per visit; scrolling back shows the finished text
+    items.forEach(function (it) { trigger.observe(it.el); });
   }
 
   function apply() {
@@ -265,8 +260,24 @@
       e.preventDefault();
       openCase(a.dataset.openCase, false);
       var p = $('#case-panel-' + a.dataset.openCase);
-      if (p) p.scrollIntoView({ block: 'center' });
+      if (p) p.scrollIntoView({ block: 'center', behavior: scrollMode(e) });
     });
+  });
+
+  // ---------- in-page links ----------
+  // Smooth scrolling only for pointer clicks. Keyboard activation (event.detail 0),
+  // the skip link and reduced-motion users jump instantly.
+  function scrollMode(e) { return reduceMotion || (e && e.detail === 0) ? 'auto' : 'smooth'; }
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a[href*="#"]');
+    if (!a || e.defaultPrevented || a.classList.contains('skip-link')) return;
+    var url = new URL(a.href, location.href);
+    if (url.origin !== location.origin || url.pathname !== location.pathname || url.hash.length < 2) return;
+    var target = document.getElementById(decodeURIComponent(url.hash.slice(1)));
+    if (!target) return;
+    e.preventDefault();
+    target.scrollIntoView({ behavior: scrollMode(e) });
+    history.pushState(null, '', url.hash);
   });
 
   // ---------- roles rings ----------
