@@ -419,3 +419,23 @@ a,button,summary,label{touch-action:manipulation}
   .toggle button[aria-pressed="false"]:hover{color:var(--light)}
   .fq summary:hover .plus{border-color:var(--ink)}
 }
+/* conversion elements (2026-11-04 CRO) */
+.hero-note{flex-basis:100%;margin-top:-12px;font-size:14px;color:#CFCFCB}
+.hero-note a{color:var(--light);text-underline-offset:3px}
+.scope{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;padding:48px;border-radius:28px;background:var(--paper);border:1px solid var(--line-l)}
+.scope h2{font-size:clamp(28px,3.2vw,48px);letter-spacing:-.03em;line-height:1.15}
+.scope-tag{color:var(--acc);margin-bottom:16px;font-size:13px}
+.scope-list{list-style:none;margin:0 0 20px;padding:0;border-top:1px solid var(--line-l)}
+.scope-list li{padding:14px 0 14px 28px;border-bottom:1px solid var(--line-l);position:relative}
+.scope-list li::before{content:"";position:absolute;left:4px;top:22px;width:10px;height:10px;border-radius:50%;background:var(--acc)}
+.scope-terms{color:var(--g-l);font-size:15px;margin-bottom:24px;max-width:52ch}
+.scope-sec{padding-block:72px}
+.m-cta{display:none}
+@media (max-width:1000px){.scope{grid-template-columns:minmax(0,1fr);gap:28px;padding:32px}}
+@media (max-width:640px){
+  .scope{padding:24px}
+  .m-cta{display:inline-flex;position:fixed;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:30;min-height:52px;box-shadow:0 12px 30px -10px rgba(0,0,0,.45);transform:translateY(160%);transition:transform .25s var(--ease-out)}
+  .mcta-on .m-cta{transform:none}
+  .mcta-on .foot{padding-bottom:96px}
+}
+@media (prefers-reduced-motion:reduce){.m-cta{transition:none}}
