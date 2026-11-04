@@ -86,9 +86,20 @@
     if (it.timer) { clearInterval(it.timer); it.timer = 0; }
     if (it.raf) { cancelAnimationFrame(it.raf); it.raf = 0; }
   }
+  // keep the brand name out of browser auto-translation
+  function brand(el) {
+    var t = el.textContent;
+    if (t.indexOf('Decisionary') < 0 || el.children.length) return;
+    var parts = t.split('Decisionary');
+    el.textContent = '';
+    parts.forEach(function (p, i) {
+      if (i) { var s = document.createElement('span'); s.setAttribute('translate', 'no'); s.textContent = 'Decisionary'; el.appendChild(s); }
+      if (p) el.appendChild(document.createTextNode(p));
+    });
+  }
   function restore(it) {
     halt(it);
-    if (it.full != null) it.el.textContent = it.full;
+    if (it.full != null) { it.el.textContent = it.full; brand(it.el); }
     if (it.label) { it.el.removeAttribute('aria-label'); it.label = false; }
     it.el.classList.remove('tw-wait');
   }
@@ -174,7 +185,7 @@
 
   function apply() {
     stopFx();
-    textNodes.forEach(function (n) { n.textContent = tr(n.dataset.i18n); });
+    textNodes.forEach(function (n) { n.textContent = tr(n.dataset.i18n); if (!n._fx) brand(n); });
     ariaNodes.forEach(function (n) { n.setAttribute('aria-label', tr(n.dataset.i18nAria)); });
     var tk = document.body.dataset.titleKey;
     document.title = cur === 'en' ? enTitle : (dict[tk] || enTitle);
