@@ -8,6 +8,23 @@
   var MAIL = 'hello@decisionarypro.com';
   // inquiry forms on Tally; languages without their own form use the English one
   var FORMS = { ko: 'https://tally.so/r/2jXGag', ja: 'https://tally.so/r/q5L1D8', en: 'https://tally.so/r/Nqr1lN' };
+  var params = new URLSearchParams(location.search);
+  // visit source tag (?src=wishket etc.): kept for this tab only and passed to the inquiry form's hidden field
+  var SRC_OK = /^[a-z0-9_-]{1,40}$/i;
+  var SRC = (function () {
+    var v = params.get('src');
+    try {
+      if (v && SRC_OK.test(v)) sessionStorage.setItem('decisionary-src', v);
+      else v = sessionStorage.getItem('decisionary-src');
+    } catch (e) {}
+    return v && SRC_OK.test(v) ? v : '';
+  })();
+  function formHref(extra) {
+    var q = [];
+    if (extra) q.push(extra);
+    if (SRC) q.push('src=' + encodeURIComponent(SRC));
+    return (FORMS[cur] || FORMS.en) + (q.length ? '?' + q.join('&') : '');
+  }
   var root = document.documentElement;
   var $ = function (s, c) { return (c || document).querySelector(s); };
   var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
@@ -42,7 +59,7 @@
   }
 
   // ---------- state for interactive blocks ----------
-  var who = 'business';
+  var who = params.get('who') === 'agency' ? 'agency' : 'business';
 
   function mailto(subject) { return 'mailto:' + MAIL + '?subject=' + encodeURIComponent(subject); }
 
@@ -51,9 +68,11 @@
     // case buttons open the inquiry form; the hidden "case" field records which case it came from
     $$('[data-form-case]').forEach(function (a) {
       var id = a.dataset.formCase;
-      a.href = (FORMS[cur] || FORMS.en) + '?case=' + encodeURIComponent(id + ' ' + tr('c' + id + '_ind'));
+      var label = id === 'scope' ? 'scope-definition' : id + ' ' + tr('c' + id + '_ind');
+      a.href = formHref('case=' + encodeURIComponent(label));
     });
-    $$('[data-form]').forEach(function (a) { a.href = FORMS[cur] || FORMS.en; });
+    $$('[data-form]').forEach(function (a) { a.href = formHref(); });
+    $$('[data-who]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.who === who)); });
     var title = $('#cta-title');
     if (title) {
       var ag = who === 'agency';
@@ -336,6 +355,21 @@
       renderDynamic();
     });
   });
+
+  // ---------- phone CTA bar: shown between the hero and the contact section ----------
+  var mcta = $('.m-cta');
+  if (mcta && 'IntersectionObserver' in window) {
+    var heroEl = $('.hero'), contactEl = $('#contact'), seen = { hero: true, contact: false };
+    var barIO = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { seen[en.target === heroEl ? 'hero' : 'contact'] = en.isIntersecting; });
+      var on = !seen.hero && !seen.contact;
+      document.body.classList.toggle('mcta-on', on);
+      mcta.setAttribute('aria-hidden', String(!on));
+      mcta.tabIndex = on ? 0 : -1;
+    });
+    if (heroEl) barIO.observe(heroEl);
+    if (contactEl) barIO.observe(contactEl);
+  }
 
   setLang(preferred(), new URLSearchParams(location.search).has('lang'));
 })();
