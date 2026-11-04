@@ -11,9 +11,10 @@ English is the default language; the site is also available in Korean, Japanese,
 - `index.html` — homepage: hero, track record (founder line, outcome figures, six project cells with detail panels), services, who does what, what we agree before starting, process, FAQ and contact
 - `cases.html` — case studies page: six projects led by the founder (overview, challenge, contribution, outcomes) with per-case inquiry links
 - `privacy.html` — privacy information
-- `i18n/<lang>.json` — translations for every language except English (ko, ja, zh-Hans, zh-Hant, vi, th, id, ms)
+- `ko/`, `ja/`, `zh-hans/`, `zh-hant/`, `vi/`, `th/`, `id/`, `ms/` — the same three pages pre-rendered in each language (generated)
+- `i18n/<lang>.json` — translation files the pages are generated from (also kept for reference)
 - `site.css` — design system and layouts, including per-language font and line-height rules
-- `site.js` — language selection and loading, plus all interactions (menu, language menu, project panels, role rings, carousel, contact toggle)
+- `site.js` — language routing (root → saved or browser language), plus all interactions (menu, language menu, project panels, role rings, carousel, contact toggle)
 - `assets/fonts/` — self-hosted fonts (see the README there)
 - `assets/og/cases.png` — LinkedIn share preview image for the case studies page
 - `favicon.svg`, `CNAME`, `robots.txt`, `sitemap.xml`
@@ -24,8 +25,8 @@ The website is served by GitHub Pages from `main` / `(root)`. Pushing to `main` 
 
 ## Languages
 
-- English copy is written in the HTML. Elements with `data-i18n="key"` (and `data-i18n-aria` for labels) are replaced from `i18n/<lang>.json`.
-- Language choice: `?lang=<code>` in the URL, then the visitor's saved choice (`localStorage` key `decisionary-lang`), then the browser language, otherwise English.
+- Every language has its own URLs: English at `/`, others under `/<slug>/` (e.g. `/ko/cases.html`). Each page is static HTML in its language with `<html lang>`, a self-canonical URL and `hreflang` links to all nine versions plus `x-default` (English). `sitemap.xml` lists all 27 URLs.
+- Language choice: a language URL opened directly is always respected. The English root redirects visitors to their saved choice (`localStorage` key `decisionary-lang`) or browser language. Old `?lang=<code>` links redirect to the matching language URL. Crawlers (no saved choice, English browser) stay on the English root.
 - Every key used in the pages must exist in every language file. Japanese and Chinese use full-width punctuation.
 - Japanese, Chinese and Thai use the visitor's system fonts so no large font files are downloaded and no third-party font service is used.
 - Translations other than English and Korean were machine-assisted and should be reviewed by native speakers before relying on them commercially, especially `privacy.html`. For those languages the privacy page notes that the English text prevails.
@@ -44,6 +45,6 @@ The website is served by GitHub Pages from `main` / `(root)`. Pushing to `main` 
 
 ## Maintenance notes
 
-- Case inquiry buttons use `data-mail-case`; the email subject is built from the industry label in the selected language.
+- Case inquiry buttons use `data-form-case`; they open the inquiry form with the case number and industry in its hidden `case` field.
 - There is no lead form, CRM integration, analytics or external ad tracking. Inquiry links use `mailto:`.
 - Update the privacy notice if contact forms, analytics, cookies or third-party processors are added.

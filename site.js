@@ -40,13 +40,19 @@
 
   var dict = {};
   var cur = 'en';
-  var cache = {};
   function tr(k) { return Object.prototype.hasOwnProperty.call(dict, k) ? dict[k] : (EN[k] != null ? EN[k] : ''); }
 
-  function preferred() {
-    var q = new URLSearchParams(location.search).get('lang');
-    if (LANGS.indexOf(q) > -1) return q;
-    try { var s = localStorage.getItem(STORE); if (LANGS.indexOf(s) > -1) return s; } catch (e) {}
+  // ---------- language URLs ----------
+  // Each language has its own pages (/ko/, /ja/ ...); English lives at the root and is the default.
+  var SLUGS = { en: '', ko: 'ko', ja: 'ja', 'zh-Hans': 'zh-hans', 'zh-Hant': 'zh-hant', vi: 'vi', th: 'th', id: 'id', ms: 'ms' };
+  var PAGE_LANG = LANGS.indexOf(root.getAttribute('lang')) > -1 ? root.getAttribute('lang') : 'en';
+  function localeUrl(l) {
+    var path = location.pathname.replace(/^\/(ko|ja|zh-hans|zh-hant|vi|th|id|ms)(\/|$)/, '/');
+    var q = new URLSearchParams(location.search); q.delete('lang');
+    var qs = q.toString();
+    return (SLUGS[l] ? '/' + SLUGS[l] : '') + path + (qs ? '?' + qs : '') + location.hash;
+  }
+  function browserLang() {
     var list = navigator.languages || [navigator.language || 'en'];
     for (var i = 0; i < list.length; i++) {
       var v = String(list[i]).toLowerCase();
@@ -56,6 +62,21 @@
       if (['ko', 'ja', 'vi', 'th', 'id', 'ms'].indexOf(b) > -1) return b;
     }
     return 'en';
+  }
+  function remember(l) { try { localStorage.setItem(STORE, l); } catch (e) {} }
+  // Which language should this visit see? Explicit ?lang= (old links) wins; a language URL opened on
+  // purpose is respected; the root follows the saved choice, then the browser language.
+  var wantLang = (function () {
+    var q = params.get('lang');
+    if (LANGS.indexOf(q) > -1) { remember(q); return q; }
+    if (PAGE_LANG !== 'en') return PAGE_LANG;
+    var s = null;
+    try { s = localStorage.getItem(STORE); } catch (e) {}
+    return LANGS.indexOf(s) > -1 ? s : browserLang();
+  })();
+  if (wantLang !== PAGE_LANG || params.has('lang')) {
+    var next = localeUrl(wantLang);
+    if (next !== location.pathname + location.search + location.hash) { location.replace(next); return; }
   }
 
   // ---------- state for interactive blocks ----------
@@ -184,22 +205,30 @@
   }
   function refreshFx() { items.forEach(function (it) { if (it.state === 'reprime') prime(it); }); }
   var fxStarted = false;
+  var FX_EVENTS = ['scroll', 'wheel', 'touchstart', 'pointerdown', 'keydown'];
   function startFx() {
     if (fxStarted) return;
     fxStarted = true;
     if (reduceMotion || !('IntersectionObserver' in window)) return;
-    $$('.chap-n b, .chap h2, .page-head h1, .cta h2').forEach(function (el) { items.push({ el: el, kind: 'type' }); });
-    $$('.fig-n em').forEach(function (el) { items.push({ el: el, kind: 'count' }); });
-    items.forEach(function (it) { it.el._fx = it; prime(it); });
-    var trigger = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) {
-        var it = en.target._fx;
-        clearTimeout(it.dwell);
-        if (en.isIntersecting) it.dwell = setTimeout(function () { play(it); }, 120);
-      });
-    }, { rootMargin: '0px 0px -25% 0px', threshold: 0 });
-    // each effect plays once per visit; scrolling back shows the finished text
-    items.forEach(function (it) { trigger.observe(it.el); });
+    // Nothing is hidden until the visitor first scrolls or interacts, so the page as loaded (and as
+    // crawlers that never scroll render it) always shows every heading and number in full.
+    var arm = function () {
+      FX_EVENTS.forEach(function (t) { window.removeEventListener(t, arm, true); });
+      var below = function (el) { return el.getBoundingClientRect().top >= innerHeight * 0.75; };
+      $$('.chap-n b, .chap h2, .page-head h1, .cta h2').forEach(function (el) { if (below(el)) items.push({ el: el, kind: 'type' }); });
+      $$('.fig-n em').forEach(function (el) { if (below(el)) items.push({ el: el, kind: 'count' }); });
+      items.forEach(function (it) { it.el._fx = it; prime(it); });
+      var trigger = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          var it = en.target._fx;
+          clearTimeout(it.dwell);
+          if (en.isIntersecting) it.dwell = setTimeout(function () { play(it); }, 120);
+        });
+      }, { rootMargin: '0px 0px -25% 0px', threshold: 0 });
+      // each effect plays once per visit; scrolling back shows the finished text
+      items.forEach(function (it) { trigger.observe(it.el); });
+    };
+    FX_EVENTS.forEach(function (t) { window.addEventListener(t, arm, { capture: true, passive: true }); });
   }
 
   function apply() {
@@ -218,22 +247,6 @@
     renderDynamic();
   }
 
-  function setLang(l, save) {
-    if (LANGS.indexOf(l) < 0) l = 'en';
-    var done = function () {
-      cur = l;
-      if (save) { try { localStorage.setItem(STORE, l); } catch (e) {} }
-      apply();
-      startFx();
-    };
-    if (l === 'en') { dict = {}; return done(); }
-    if (cache[l]) { dict = cache[l]; return done(); }
-    fetch('/i18n/' + l + '.json?v=' + (document.documentElement.dataset.v || ''), { cache: 'force-cache' })
-      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-      .then(function (d) { cache[l] = d; dict = d; done(); })
-      .catch(function () { dict = {}; l = 'en'; done(); });
-  }
-
   // ---------- language menu ----------
   var langBtn = $('#lang-btn');
   var langList = $('#lang-list');
@@ -247,8 +260,9 @@
       closeMenu();
       if (open) { var c = $('[aria-current="true"]', langList); if (c) c.focus(); }
     });
-    $$('[data-lang]').forEach(function (b) {
-      b.addEventListener('click', function () { setLang(b.dataset.lang, true); closeLang(); langBtn.focus(); });
+    // language items are real links to the other language's URL; remember the choice for root visits
+    $$('[data-lang]').forEach(function (a) {
+      a.addEventListener('click', function () { remember(a.dataset.lang); });
     });
   }
 
@@ -372,5 +386,9 @@
     if (contactEl) barIO.observe(contactEl);
   }
 
-  setLang(preferred(), new URLSearchParams(location.search).has('lang'));
+  // the page is already rendered in its language; wire up dynamic text and effects
+  cur = PAGE_LANG;
+  dict = {};
+  apply();
+  startFx();
 })();
