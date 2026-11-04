@@ -48,9 +48,10 @@
 
   function renderDynamic() {
     stopFx();
-    $$('[data-mail-case]').forEach(function (a) {
-      var id = a.dataset.mailCase;
-      a.href = mailto('[' + tr('c' + id + '_ind') + '] ' + tr('h_caseSubj') + ' | Decisionary');
+    // case buttons open the inquiry form; the hidden "case" field records which case it came from
+    $$('[data-form-case]').forEach(function (a) {
+      var id = a.dataset.formCase;
+      a.href = (FORMS[cur] || FORMS.en) + '?case=' + encodeURIComponent(id + ' ' + tr('c' + id + '_ind'));
     });
     $$('[data-form]').forEach(function (a) { a.href = FORMS[cur] || FORMS.en; });
     var title = $('#cta-title');
