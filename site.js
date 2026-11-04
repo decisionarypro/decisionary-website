@@ -287,16 +287,22 @@
 
   // ---------- before-we-start carousel ----------
   var val = 0;
-  function showVal(i) {
-    val = (i + 5) % 5;
-    $$('[data-val]').forEach(function (v) { v.hidden = Number(v.dataset.val) !== val; });
+  function showVal(i, dir) {
+    var next = (i + 5) % 5;
+    // slide in from the side the user moved toward (dots: compare positions)
+    dir = dir || (next > val ? 'next' : 'prev');
+    val = next;
+    $$('[data-val]').forEach(function (v) {
+      v.hidden = Number(v.dataset.val) !== val;
+      if (!v.hidden) v.dataset.dir = dir;
+    });
     $$('[data-val-dot]').forEach(function (d) { d.setAttribute('aria-pressed', String(Number(d.dataset.valDot) === val)); });
     var c = $('#val-counter'); if (c) c.textContent = '0' + (val + 1) + ' / 05';
   }
   $$('[data-val-dot]').forEach(function (d) { d.addEventListener('click', function () { showVal(Number(d.dataset.valDot)); }); });
   if ($('#val-prev')) {
-    $('#val-prev').addEventListener('click', function () { showVal(val - 1); });
-    $('#val-next').addEventListener('click', function () { showVal(val + 1); });
+    $('#val-prev').addEventListener('click', function () { showVal(val - 1, 'prev'); });
+    $('#val-next').addEventListener('click', function () { showVal(val + 1, 'next'); });
   }
 
   // ---------- contact: business or agency ----------
