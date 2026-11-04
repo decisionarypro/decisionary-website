@@ -359,7 +359,8 @@
   // ---------- phone CTA bar: shown between the hero and the contact section ----------
   var mcta = $('.m-cta');
   if (mcta && 'IntersectionObserver' in window) {
-    var heroEl = $('.hero'), contactEl = $('#contact'), seen = { hero: true, contact: false };
+    // hide only while the contact section's own form button is on screen, not for the whole section
+    var heroEl = $('.hero'), contactEl = $('#contact .fit [data-form]') || $('#contact'), seen = { hero: true, contact: false };
     var barIO = new IntersectionObserver(function (entries) {
       entries.forEach(function (en) { seen[en.target === heroEl ? 'hero' : 'contact'] = en.isIntersecting; });
       var on = !seen.hero && !seen.contact;
