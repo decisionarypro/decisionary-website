@@ -30,7 +30,7 @@ html.l-zh-Hant{--font:Inter,'PingFang TC','Microsoft JhengHei','Noto Sans TC',sa
 html.l-th{--font:Inter,Thonburi,'Leelawadee UI','Noto Sans Thai',Tahoma,sans-serif}
 *{box-sizing:border-box}
 [hidden]{display:none !important}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--light);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:clip}
 .l-ko body{word-break:keep-all}
 .l-ja body,.l-zh-Hans body,.l-zh-Hant body{line-break:strict}
@@ -67,7 +67,7 @@ main[id],section[id],article[id]{scroll-margin-top:84px}
 @supports (animation-timeline:view()){
   .rv{animation:rv linear both;animation-timeline:view();animation-range:entry 0% entry 40%}
 }
-@keyframes rv{from{opacity:0;transform:translateY(34px)}to{opacity:1;transform:none}}
+@keyframes rv{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 .tw-off{visibility:hidden}
 .tw-off::before{content:"";visibility:visible;display:inline-block;width:.07em;min-width:2px;height:.85em;margin:0 .04em 0 .02em;vertical-align:-.08em;background:var(--acc);animation:caret .9s steps(1) infinite}
 @keyframes caret{50%{opacity:0}}
@@ -141,15 +141,15 @@ main[id],section[id],article[id]{scroll-margin-top:84px}
 .l-vi .hero h1,.l-id .hero h1,.l-ms .hero h1{font-size:clamp(40px,6.2vw,100px);line-height:1.12}
 .hero h1 .w{display:inline-block;overflow:hidden;vertical-align:bottom;padding:.12em 0 .08em}
 .hero h1 .w span{display:inline-block;transform:translateY(110%);animation:up .9s var(--e) forwards}
-.hero h1 .w:nth-child(2) span{animation-delay:.08s}
-.hero h1 .w:nth-child(4) span{animation-delay:.18s}
-.hero h1 .w:nth-child(5) span{animation-delay:.26s}
+.hero h1 .w:nth-child(2) span{animation-delay:.06s}
+.hero h1 .w:nth-child(4) span{animation-delay:.12s}
+.hero h1 .w:nth-child(5) span{animation-delay:.18s}
 .hero h1 .dim{color:var(--g-d)}
 @keyframes up{to{transform:none}}
-.hero-sub{display:flex;justify-content:space-between;align-items:end;gap:32px;flex-wrap:wrap;margin-top:36px;opacity:0;animation:fadein .6s .35s var(--e) forwards}
+.hero-sub{display:flex;justify-content:space-between;align-items:end;gap:32px;flex-wrap:wrap;margin-top:36px;opacity:0;transform:translateY(8px);animation:rise .4s .12s var(--ease-out) forwards}
 .hero-sub p{max-width:44ch;font-size:clamp(16px,1.4vw,20px);color:#CFCFCB}
 .hero-actions{display:flex;gap:10px;flex-wrap:wrap}
-@keyframes fadein{to{opacity:1}}
+@keyframes rise{to{opacity:1;transform:none}}
 .hero-bar{position:relative;border-top:1px solid var(--line-d);display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
 .hero-bar div{padding:20px 0;display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
 .hero-bar div + div{padding-left:24px;border-left:1px solid var(--line-d)}
@@ -242,7 +242,7 @@ main[id],section[id],article[id]{scroll-margin-top:84px}
 .vs-d{font-size:clamp(16px,1.3vw,19px);line-height:1.7;color:#CFCFCB;max-width:48ch;padding-top:30px}
 .vs-foot{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line-d);padding-top:18px;gap:16px}
 .dots{display:flex;gap:6px}
-.dotb{width:44px;height:44px;border:0;background:transparent;display:grid;place-items:center;padding:0}
+.dotb{width:44px;height:44px;border:0;background:transparent;display:grid;place-items:center;padding:0;transition:transform .16s var(--ease-out)}
 .dotb i{display:block;width:44px;height:3px;border-radius:3px;background:rgba(247,247,245,.2);transform:scaleX(.64);transform-origin:left center;transition:background-color .2s ease,transform .25s var(--ease-in-out)}
 .dotb[aria-pressed="true"] i{background:var(--acc);transform:none}
 .vnav{width:44px;height:44px;border-radius:50%;border:1px solid var(--line-d);background:transparent;color:var(--light);display:grid;place-items:center;transition:background-color .2s ease,color .2s ease,transform .16s var(--ease-out)}
@@ -388,7 +388,7 @@ main[id],section[id],article[id]{scroll-margin-top:84px}
   .rv,.hero h1 .w span,.hero-sub,.hero-sat{animation:none !important}
   .lsel-list,.overlay,.detail,.rp-body,.vs-row,.row-x,.fq-a{animation:fade .15s ease both !important}
   .hero h1 .w span{transform:none}
-  .hero-sub{opacity:1}
+  .hero-sub{opacity:1;transform:none}
 }
 
 /* inquiry form + call booking (2026-11-04) */
@@ -403,3 +403,11 @@ main[id],section[id],article[id]{scroll-margin-top:84px}
 
 /* press feedback (2026-11-04 motion review) */
 .lsel-btn:active,.menu-pill:active,.rnav:active,.vnav:active,.toggle button:active{transform:scale(.97)}
+/* press feedback for cells, dots and accordion icons (motion review 2) */
+.cell:active{background:#E4E4E0}
+.cell[aria-expanded="true"]:active{background:#1B1C20}
+.cell:active .cell-go{transform:scale(.92);transition-duration:.16s}
+.cell[aria-expanded="true"]:active .cell-go{transform:rotate(45deg) scale(.92)}
+.dotb:active{transform:scale(.92)}
+.row summary:active .plus,.fq summary:active .plus{transform:scale(.92)}
+.row[open] summary:active .plus,.fq[open] summary:active .plus{transform:rotate(45deg) scale(.92)}
