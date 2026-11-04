@@ -421,7 +421,7 @@ a,button,summary,label{touch-action:manipulation}
 }
 /* conversion elements (2026-11-04 CRO) */
 .hero-note{flex-basis:100%;margin-top:-12px;font-size:14px;color:#CFCFCB}
-.hero-note a{color:var(--light);text-underline-offset:3px}
+.hero-note a{color:var(--light);text-underline-offset:3px;white-space:nowrap}
 .scope{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;padding:48px;border-radius:28px;background:var(--paper);border:1px solid var(--line-l)}
 .scope h2{font-size:clamp(28px,3.2vw,48px);letter-spacing:-.03em;line-height:1.15}
 .scope-tag{color:var(--acc);margin-bottom:16px;font-size:13px}
@@ -439,3 +439,6 @@ a,button,summary,label{touch-action:manipulation}
   .mcta-on .foot{padding-bottom:96px}
 }
 @media (prefers-reduced-motion:reduce){.m-cta{transition:none}}
+/* even out short last lines (2026-11-04 wrap audit) */
+.lede,.cta-lede,.hero-sub p,.vs-t,.cell-m,.scope-terms{text-wrap:balance}
+.cell-m{display:block}
