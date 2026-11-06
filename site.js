@@ -69,15 +69,15 @@
     return 'en';
   }
   function remember(l) { try { localStorage.setItem(STORE, l); } catch (e) {} }
-  // Which language should this visit see? Explicit ?lang= (old links) wins; a language URL opened on
-  // purpose is respected; the root follows the saved choice, then the browser language.
+  // Which language should this visit see? Only explicit choices redirect: ?lang= (old links) or a
+  // language the visitor picked before. The browser language never redirects (search engines must see
+  // the page as it is); it only offers a hint to switch, further below.
+  var SAVED = (function () { var s = null; try { s = localStorage.getItem(STORE); } catch (e) {} return LANGS.indexOf(s) > -1 ? s : null; })();
   var wantLang = (function () {
     var q = params.get('lang');
     if (LANGS.indexOf(q) > -1) { remember(q); return q; }
     if (PAGE_LANG !== 'en') return PAGE_LANG;
-    var s = null;
-    try { s = localStorage.getItem(STORE); } catch (e) {}
-    return LANGS.indexOf(s) > -1 ? s : browserLang();
+    return SAVED || PAGE_LANG;
   })();
   // only redirect to a language this page actually has (its hreflang alternates); pages that exist in
   // fewer languages (service pages, the scope check, 404) stay as they are instead of landing on a missing URL
@@ -87,6 +87,33 @@
     var next = localeUrl(wantLang);
     if (next !== location.pathname + location.search + location.hash) { location.replace(next); return; }
   }
+
+  // ---------- language hint: the browser prefers another language this page has ----------
+  var HINT = {
+    en: ['This page is also available in English.', 'View in English', 'Close'],
+    ko: ['이 페이지는 한국어로도 볼 수 있습니다.', '한국어로 보기', '닫기'],
+    ja: ['このページは日本語でもご覧いただけます。', '日本語で見る', '閉じる'],
+    'zh-Hans': ['此页面也有简体中文版本。', '查看中文版', '关闭'],
+    'zh-Hant': ['此頁面也有繁體中文版本。', '查看中文版', '關閉'],
+    vi: ['Trang này có phiên bản tiếng Việt.', 'Xem bằng tiếng Việt', 'Đóng'],
+    th: ['หน้านี้มีภาษาไทยด้วย', 'ดูภาษาไทย', 'ปิด'],
+    id: ['Halaman ini tersedia dalam Bahasa Indonesia.', 'Lihat dalam Bahasa Indonesia', 'Tutup'],
+    ms: ['Halaman ini tersedia dalam Bahasa Melayu.', 'Lihat dalam Bahasa Melayu', 'Tutup']
+  };
+  (function () {
+    var b = browserLang();
+    if (SAVED || params.has('lang') || b === PAGE_LANG || !HAS[b] || !HINT[b]) return;
+    var t = HINT[b], box = document.createElement('div');
+    box.className = 'lang-hint';
+    box.setAttribute('role', 'region');
+    box.setAttribute('aria-label', t[0]);
+    box.lang = b;
+    box.innerHTML = '<p>' + t[0] + '</p><a class="lang-hint-go" href="' + localeUrl(b) + '">' + t[1] + '</a>' +
+      '<button type="button" class="lang-hint-x" aria-label="' + t[2] + '"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>';
+    document.body.appendChild(box);
+    box.querySelector('.lang-hint-go').addEventListener('click', function () { remember(b); });
+    box.querySelector('.lang-hint-x').addEventListener('click', function () { remember(PAGE_LANG); box.remove(); });
+  })();
 
   // ---------- state for interactive blocks ----------
   var who = params.get('who') === 'agency' ? 'agency' : 'business';

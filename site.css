@@ -579,3 +579,14 @@ html.l-th .sc-q,html.l-th .sc-h1{line-height:1.45;letter-spacing:0}
 .nf h1{font-size:clamp(32px,5vw,56px);letter-spacing:-.03em;margin:16px 0 12px}
 .nf .lede{margin-top:4px;color:var(--g-l)}
 .nf-links{display:flex;flex-wrap:wrap;gap:10px;margin-top:32px}
+/* language hint (2026-11-06): floats under the header, never pushes the page */
+.lang-hint{position:fixed;top:calc(80px + env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px));z-index:45;max-width:380px;
+  display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px 12px;padding:14px 14px 14px 18px;border-radius:16px;
+  background:var(--ink2);color:var(--light);border:1px solid var(--line-d);box-shadow:0 16px 40px -16px rgba(0,0,0,.5);animation:hint-in .22s var(--ease-out) both}
+@keyframes hint-in{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.lang-hint p{margin:0;font-size:14px;line-height:1.45;grid-column:1}
+.lang-hint-go{grid-column:1;justify-self:start;display:inline-flex;align-items:center;min-height:36px;padding:0 14px;border-radius:999px;background:var(--acc);color:#fff;font-size:13.5px;font-weight:600;text-decoration:none}
+.lang-hint-x{grid-column:2;grid-row:1 / span 2;align-self:start;display:grid;place-items:center;width:36px;height:36px;border:0;border-radius:50%;background:transparent;color:var(--g-d);cursor:pointer}
+@media (hover:hover) and (pointer:fine){.lang-hint-x:hover{color:var(--light);background:rgba(247,247,245,.08)}}
+@media (max-width:640px){.lang-hint{left:max(16px,env(safe-area-inset-left,0px));max-width:none}}
+@media (prefers-reduced-motion:reduce){.lang-hint{animation:none}}
