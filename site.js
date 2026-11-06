@@ -74,7 +74,11 @@
     try { s = localStorage.getItem(STORE); } catch (e) {}
     return LANGS.indexOf(s) > -1 ? s : browserLang();
   })();
-  if (wantLang !== PAGE_LANG || params.has('lang')) {
+  // only redirect to a language this page actually has (its hreflang alternates); pages that exist in
+  // fewer languages (service pages, the scope check, 404) stay as they are instead of landing on a missing URL
+  var HAS = {};
+  Array.prototype.forEach.call(document.querySelectorAll('link[rel="alternate"][hreflang]'), function (l) { HAS[l.getAttribute('hreflang')] = true; });
+  if ((wantLang !== PAGE_LANG || params.has('lang')) && HAS[wantLang]) {
     var next = localeUrl(wantLang);
     if (next !== location.pathname + location.search + location.hash) { location.replace(next); return; }
   }

@@ -574,3 +574,8 @@ html.l-th .sc-q,html.l-th .sc-h1{line-height:1.45;letter-spacing:0}
 @media (hover:hover) and (pointer:fine){.foot-langs a:hover{color:var(--light)}}
 .foot-langs + .foot-b{margin-top:16px}
 .foot-langs > svg{flex:none;margin-right:8px}
+/* 404 page */
+.nf{min-height:60vh}
+.nf h1{font-size:clamp(32px,5vw,56px);letter-spacing:-.03em;margin:16px 0 12px}
+.nf .lede{margin-top:4px;color:var(--g-l)}
+.nf-links{display:flex;flex-wrap:wrap;gap:10px;margin-top:32px}
