@@ -543,3 +543,31 @@ html.l-th .sc-q,html.l-th .sc-h1{line-height:1.45;letter-spacing:0}
 .scope .sc-entry{margin-top:16px}
 @media (prefers-reduced-motion:reduce){.sc-screen{animation:none}.sc-btn,.sc-opt,.sc-track i,.sc-dot,.sc-dot svg,.sc-bar i{transition:none}}
 .sc-entry a{white-space:nowrap}
+/* utilities (2026-11-06): scope check and 30-minute call. Hierarchy: filled = main action, outline = tool, icon + text = call */
+.ico{flex:none;width:18px;height:18px}
+.pill .ico{margin-left:-4px}
+.pill-line-l{border-color:var(--line-l);color:var(--ink);background:transparent}
+@media (hover:hover) and (pointer:fine){.pill-line-l:hover{border-color:var(--ink)}}
+.scope-acts{display:flex;flex-wrap:wrap;gap:10px}
+.hdr-tool{gap:8px;padding:0 16px}
+.hdr-book{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 12px;border-radius:999px;color:var(--light);font-size:14px;font-weight:500;text-decoration:none;white-space:nowrap;transition:background-color .2s ease,transform .16s var(--ease-out)}
+.hdr-book:active{transform:scale(.97)}
+@media (hover:hover) and (pointer:fine){.hdr-book:hover{background:rgba(247,247,245,.08)}}
+.hdr-tool,.hdr-r .pill-acc{white-space:nowrap}
+@media (max-width:1240px){.hide-lg{display:none}}
+@media (max-width:1100px){.hide-md{display:none}}
+.ov-tools{grid-column:1/-1}
+.ov-tools-h{font-size:12px;color:var(--g-d);margin:0 0 12px}
+.ov-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.overlay .ov-card{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:2px 14px;min-height:0;padding:18px 20px;border:1px solid var(--line-d);border-radius:18px;
+  font-size:16px;letter-spacing:0;line-height:1.4;background:rgba(247,247,245,.03);color:var(--light);transition:border-color .2s ease,transform .16s var(--ease-out)}
+.overlay .ov-card:active{transform:scale(.98)}
+.overlay .ov-card .ico{width:24px;height:24px;grid-row:1 / span 2;color:var(--acc)}
+.ov-card b{font-weight:600;font-size:17px}
+.ov-card small{grid-column:2;color:var(--g-d);font-size:13px}
+.ov-card .go{grid-row:1 / span 2;grid-column:3;color:var(--g-d)}
+.overlay .ov-card.is-primary{background:var(--acc);border-color:var(--acc);color:#fff}
+.overlay .ov-card.is-primary .ico,.ov-card.is-primary small,.ov-card.is-primary .go{color:rgba(255,255,255,.88)}
+@media (hover:hover) and (pointer:fine){.overlay .ov-card:hover{color:var(--light);border-color:rgba(247,247,245,.5)}.overlay .ov-card.is-primary:hover{color:#fff;background:var(--acc-ink)}}
+.foot-grid{grid-template-columns:minmax(0,1.4fr) repeat(4,minmax(0,1fr))}
+@media (max-width:1000px){.ov-cards{grid-template-columns:minmax(0,1fr)}.foot-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
