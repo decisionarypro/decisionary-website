@@ -9,6 +9,11 @@
   // inquiry forms on Tally; languages without their own form use the English one
   var FORMS = { ko: 'https://tally.so/r/2jXGag', ja: 'https://tally.so/r/q5L1D8', en: 'https://tally.so/r/Nqr1lN' };
   var params = new URLSearchParams(location.search);
+  // ?notrack excludes this browser from the visit statistics (Umami reads umami.disabled); ?track turns it back on
+  try {
+    if (params.has('notrack')) localStorage.setItem('umami.disabled', '1');
+    if (params.has('track')) localStorage.removeItem('umami.disabled');
+  } catch (e) {}
   // visit source tag (?src=wishket etc.): kept for this tab only and passed to the inquiry form's hidden field
   var SRC_OK = /^[a-z0-9_-]{1,40}$/i;
   var SRC = (function () {
