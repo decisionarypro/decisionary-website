@@ -7,6 +7,7 @@
   if (!root || !dataEl) return;
   var D = JSON.parse(dataEl.textContent), L = D.t, lang = D.lang;
   var stage = document.getElementById('sc-stage');
+  var about = document.getElementById('sc-about');
 
   // risk points per answer: 0 = settled, 1 = partly, 2 = open
   var META = [
@@ -59,9 +60,12 @@
   function bindStart() {
     var go = document.getElementById('sc-go');
     if (go) go.onclick = function () { track('tool_start', { tool: 'scope-check', lang: lang }); step = 0; question(); };
+    // the question preview only belongs to the start screen
+    if (about) about.hidden = false;
   }
 
   function question() {
+    if (about) about.hidden = true;
     var list = steps(), i = list[step], q = L.q[i];
     // numbering stays out of 10 even when a question is skipped
     var n = i + 1, total = META.length;
@@ -98,6 +102,7 @@
   }
 
   function result() {
+    if (about) about.hidden = true;
     var r = compute(), band = L.bands[r.b], top = r.risks.slice(0, 3), more = r.risks.length - top.length;
     var SRC = getSrc();
     if (!tracked) { tracked = true; track('tool_complete', { tool: 'scope-check', score: r.score, band: r.key, answers: r.code, lang: lang }); }
