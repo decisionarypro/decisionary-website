@@ -566,3 +566,11 @@ html.l-th .sc-q,html.l-th .sc-h1{line-height:1.45;letter-spacing:0}
 @media (hover:hover) and (pointer:fine){.overlay .ov-card:hover{color:var(--light);border-color:rgba(247,247,245,.5)}.overlay .ov-card.is-primary:hover{color:#fff;background:var(--acc-ink)}}
 .foot-grid{grid-template-columns:minmax(0,1.4fr) repeat(4,minmax(0,1fr))}
 @media (max-width:1000px){.ov-cards{grid-template-columns:minmax(0,1fr)}.foot-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* language row in the footer (2026-11-06): first visits follow the browser language */
+.foot-langs{margin-top:40px;display:flex;flex-wrap:wrap;align-items:center;gap:0 4px;font-size:13px;color:var(--g-d)}
+.foot-langs .ico{width:16px;height:16px;margin-right:8px}
+.foot-langs a{display:inline-flex;align-items:center;min-height:36px;padding:0 8px;border-radius:999px;color:#A3A39E;text-decoration:none;transition:color .2s ease}
+.foot-langs a[aria-current="true"]{color:var(--light);font-weight:600}
+@media (hover:hover) and (pointer:fine){.foot-langs a:hover{color:var(--light)}}
+.foot-langs + .foot-b{margin-top:16px}
+.foot-langs > svg{flex:none;margin-right:8px}

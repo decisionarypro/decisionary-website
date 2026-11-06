@@ -260,11 +260,11 @@
       closeMenu();
       if (open) { var c = $('[aria-current="true"]', langList); if (c) c.focus(); }
     });
-    // language items are real links to the other language's URL; remember the choice for root visits
-    $$('[data-lang]').forEach(function (a) {
-      a.addEventListener('click', function () { remember(a.dataset.lang); });
-    });
   }
+  // language links (footer) go to the other language's URL; remember the choice for root visits
+  $$('[data-lang]').forEach(function (a) {
+    a.addEventListener('click', function () { remember(a.dataset.lang); });
+  });
 
   // ---------- menu overlay ----------
   var menuBtn = $('#menu-btn');
