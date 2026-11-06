@@ -532,11 +532,6 @@ html.l-th .sc-q,html.l-th .sc-h1{line-height:1.45;letter-spacing:0}
 .sc-ic{color:var(--sc-muted);font-size:13px}
 @media (hover:hover) and (pointer:fine){.sc-link:hover .sc-t{text-decoration-color:currentColor}}
 .sc-note{margin:40px 0 0;font-size:12.5px;color:var(--sc-muted);text-wrap:pretty}
-.sc-about{max-width:560px;margin:72px auto 0;padding-top:32px;border-top:1px solid var(--line-l);color:#1B1C1F}
-.sc-about h2{font-size:20px;letter-spacing:-.02em;margin:0 0 10px}
-.sc-about>p{color:#64645F;margin:0 0 20px;font-size:15px;text-wrap:pretty}
-.sc-about h3{font-size:14px;margin:20px 0 6px;color:#2453E0}
-.sc-about ol{margin:0;padding-left:1.3em;display:grid;gap:4px;font-size:15px}
 .sc-entry{margin-top:10px;font-size:14px}
 .sc-entry a{color:inherit;font-weight:600;text-underline-offset:4px}
 .dark .sc-entry{color:#CFCFCB}
@@ -571,11 +566,3 @@ html.l-th .sc-q,html.l-th .sc-h1{line-height:1.45;letter-spacing:0}
 @media (hover:hover) and (pointer:fine){.overlay .ov-card:hover{color:var(--light);border-color:rgba(247,247,245,.5)}.overlay .ov-card.is-primary:hover{color:#fff;background:var(--acc-ink)}}
 .foot-grid{grid-template-columns:minmax(0,1.4fr) repeat(4,minmax(0,1fr))}
 @media (max-width:1000px){.ov-cards{grid-template-columns:minmax(0,1fr)}.foot-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-/* question preview: one quiet collapsed line under the start screen */
-details.sc-about{max-width:560px;margin:64px auto 0;padding-top:0;border-top:0}
-.sc-about summary{display:inline-flex;align-items:center;gap:8px;min-height:44px;cursor:pointer;list-style:none;font-size:13.5px;color:#64645F}
-.sc-about summary::-webkit-details-marker{display:none}
-.sc-about summary::after{content:"";width:6px;height:6px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:translateY(-2px) rotate(45deg);transition:transform .2s var(--ease-out)}
-.sc-about[open] summary::after{transform:translateY(1px) rotate(225deg)}
-@media (hover:hover) and (pointer:fine){.sc-about summary:hover{color:#1B1C1F}}
-.sc-about[open] summary{margin-bottom:12px}
