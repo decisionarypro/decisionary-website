@@ -571,3 +571,11 @@ html.l-th .sc-q,html.l-th .sc-h1{line-height:1.45;letter-spacing:0}
 @media (hover:hover) and (pointer:fine){.overlay .ov-card:hover{color:var(--light);border-color:rgba(247,247,245,.5)}.overlay .ov-card.is-primary:hover{color:#fff;background:var(--acc-ink)}}
 .foot-grid{grid-template-columns:minmax(0,1.4fr) repeat(4,minmax(0,1fr))}
 @media (max-width:1000px){.ov-cards{grid-template-columns:minmax(0,1fr)}.foot-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* question preview: one quiet collapsed line under the start screen */
+details.sc-about{max-width:560px;margin:64px auto 0;padding-top:0;border-top:0}
+.sc-about summary{display:inline-flex;align-items:center;gap:8px;min-height:44px;cursor:pointer;list-style:none;font-size:13.5px;color:#64645F}
+.sc-about summary::-webkit-details-marker{display:none}
+.sc-about summary::after{content:"";width:6px;height:6px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:translateY(-2px) rotate(45deg);transition:transform .2s var(--ease-out)}
+.sc-about[open] summary::after{transform:translateY(1px) rotate(225deg)}
+@media (hover:hover) and (pointer:fine){.sc-about summary:hover{color:#1B1C1F}}
+.sc-about[open] summary{margin-bottom:12px}
