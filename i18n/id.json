@@ -283,7 +283,7 @@
 "pg1_l1": "Penjadwalan panggilan: nama, email, perusahaan, apa yang ingin Anda bangun, waktu janji, dan tautan panggilan video",
 "pg1_l2": "Email: alamat dan isi pesan Anda",
 "pg1_l3": "Kunjungan situs: log akses yang disimpan penyedia hosting untuk keamanan (alamat IP, informasi browser, waktu kunjungan)",
-"pg1_l4": "Statistik situs: data kunjungan tanpa cookie (halaman yang dilihat, situs perujuk, jenis browser dan perangkat, negara, dan jenis tombol yang diklik). Tidak memuat nama atau email, dan alamat IP tidak disimpan.",
+"pg1_l4": "Statistik situs: data kunjungan tanpa cookie (halaman yang dilihat, situs perujuk, jenis browser dan perangkat, negara, jenis tombol yang diklik, dan jawaban cek cakupan dalam bentuk angka). Tidak memuat nama atau email, dan alamat IP tidak disimpan.",
 "pg1_p0": "Kami hanya memproses apa yang Anda isi atau kirimkan. Kami tidak meminta data sensitif seperti kesehatan atau keyakinan, jadi mohon tidak mengirimkannya.",
 "pg2_h": "Tujuan dan dasar hukum",
 "pg2_l0": "Meninjau dan menjawab pertanyaan, mengadakan panggilan, menyiapkan estimasi atau proposal: langkah yang Anda minta sebelum kontrak (Pasal 6(1)(b) GDPR; Pasal 15(1)4 UU Perlindungan Informasi Pribadi Korea). Formulir berbahasa Korea juga meminta persetujuan.",

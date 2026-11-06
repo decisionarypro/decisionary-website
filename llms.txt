@@ -18,6 +18,10 @@ Last updated: 2026-11-04
 - [Insurtech development](https://decisionarypro.com/insurtech.html): insurance sign-up flows, embedded and partner channels, admin tools
 - [Development partner for agencies](https://decisionarypro.com/agency-partner.html): white-label delivery, help scoping a client brief before the agency quotes
 
+## Free tool
+
+- [Scope check](https://decisionarypro.com/scope-check.html) (also [Korean](https://decisionarypro.com/ko/scope-check.html) and [Japanese](https://decisionarypro.com/ja/scope-check.html)): ten questions, about two minutes, no sign-up. It returns a 0–100 scope risk score (lower is better) and the three things to settle before asking for a quote.
+
 ## How an engagement works
 
 1. Free review of the brief; the founder replies within one business day

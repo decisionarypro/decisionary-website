@@ -387,7 +387,7 @@
   }
 
   // ---------- visit statistics (Umami, cookie-free; no personal data in any value) ----------
-  var LOCS = [['.m-cta', 'mobile-bar'], ['.hdr', 'header'], ['.overlay', 'menu'], ['.hero', 'hero'], ['.page-head', 'top'],
+  var LOCS = [['.sc', 'tool'], ['.m-cta', 'mobile-bar'], ['.hdr', 'header'], ['.overlay', 'menu'], ['.hero', 'hero'], ['.page-head', 'top'],
     ['.scope-sec', 'scope'], ['[data-case-panel]', 'case'], ['.cs-act', 'case'], ['.lp-body', 'body'], ['#contact', 'contact'], ['.foot', 'footer']];
   function where(el) {
     for (var i = 0; i < LOCS.length; i++) if (el.closest(LOCS[i][0])) return LOCS[i][1];
@@ -412,6 +412,8 @@
     } else if (el.matches('[data-case]') && el.getAttribute('aria-expanded') === 'true') {
       // the cell's own handler has just opened it
       track('case_open', { case: el.dataset.case, from: 'tab' });
+    } else if (el.matches('a[href$="scope-check.html"]')) {
+      track('tool_entry_click', { tool: 'scope-check', location: where(el) });
     } else if (el.matches('[data-lang]')) {
       track('language_select', { to: el.dataset.lang, from: PAGE_LANG });
     }

@@ -1,0 +1,142 @@
+/* Scope check tool: one question at a time, then a risk score and the 3 things to settle first.
+   Text and links for the page language come from <script id="sc-data">. Answers stay in the page;
+   only the score and answer digits travel with the inquiry form and the cookie-free statistics. */
+(function () {
+  var root = document.getElementById('sc');
+  var dataEl = document.getElementById('sc-data');
+  if (!root || !dataEl) return;
+  var D = JSON.parse(dataEl.textContent), L = D.t, lang = D.lang;
+  var stage = document.getElementById('sc-stage');
+
+  // risk points per answer: 0 = settled, 1 = partly, 2 = open
+  var META = [
+    { cat: 0 }, { cat: 0 }, { cat: 1 }, { cat: 2 }, { cat: 2, skipIf: { q: 3, v: 0 } },
+    { cat: 2 }, { cat: 3 }, { cat: 4 }, { cat: 4 }, { cat: 4 }
+  ];
+  var BAND_MAX = [30, 60, 100], BAND_KEY = ['low', 'mid', 'high'];
+  // shape as well as color, so the level reads at a glance and without color
+  var ICON = {
+    low: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+    mid: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.5v.01"/></svg>',
+    high: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l9.5 16.5h-19z"/><path d="M12 10v4.5M12 17.5v.01"/></svg>'
+  };
+  var CHECK = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  var ans = META.map(function () { return null; });
+  var step = 0, advancing = null, tracked = false;
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // visit source (?src=…): read when needed, because site.js stores it after this script has run
+  function getSrc() {
+    var ok = /^[a-z0-9_-]{1,40}$/i, v = new URLSearchParams(location.search).get('src');
+    if (v && ok.test(v)) return v;
+    try { v = sessionStorage.getItem('decisionary-src'); } catch (e) { v = ''; }
+    return v && ok.test(v) ? v : '';
+  }
+
+  function track(name, data) { try { if (window.umami && window.umami.track) window.umami.track(name, data); } catch (e) {} }
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function fmt(s, o) { return s.replace(/\{(\w+)\}/g, function (_, k) { return o[k]; }); }
+  // a question is skipped when it does not apply (API docs when there is no integration)
+  function skipped(i) { var s = META[i].skipIf; return !!s && ans[s.q] === s.v; }
+  function steps() { return META.map(function (_, i) { return i; }).filter(function (i) { return !skipped(i); }); }
+
+  function show(html, focusSel) {
+    stage.innerHTML = '<div class="sc-screen">' + html + '</div>';
+    var f = focusSel && stage.querySelector(focusSel);
+    if (f) f.focus({ preventScroll: true });
+    // keep the tool in view when the screen changes
+    var top = root.getBoundingClientRect().top;
+    if (top < 0 || top > window.innerHeight * 0.5) root.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' });
+  }
+
+  function startScreen() {
+    show('<p class="sc-eyebrow">' + L.eyebrow + '</p>' +
+      '<h1 class="sc-h1" id="sc-title" tabindex="-1">' + L.h1 + '</h1>' +
+      '<p class="sc-lede">' + L.lede + '</p>' +
+      '<button type="button" class="sc-btn" id="sc-go">' + L.start + '</button>' +
+      '<p class="sc-fine">' + L.fine + '</p>', '#sc-title');
+    bindStart();
+  }
+  function bindStart() {
+    var go = document.getElementById('sc-go');
+    if (go) go.onclick = function () { track('tool_start', { tool: 'scope-check', lang: lang }); step = 0; question(); };
+  }
+
+  function question() {
+    var list = steps(), i = list[step], q = L.q[i];
+    // numbering stays out of 10 even when a question is skipped
+    var n = i + 1, total = META.length;
+    show('<div class="sc-qbar"><button type="button" class="sc-back" id="sc-back">' + L.back + '</button>' +
+      '<span class="sc-track" aria-hidden="true"><i style="width:' + Math.round(i / total * 100) + '%"></i></span>' +
+      '<span class="sc-count"><span class="visually-hidden">' + L.qWord + ' </span>' + n + ' / ' + total + '</span></div>' +
+      '<p class="sc-cat">' + L.cats[META[i].cat] + '</p>' +
+      '<h2 class="sc-q" id="sc-q" tabindex="-1">' + esc(q[0]) + '</h2>' +
+      '<div class="sc-opts">' + q[1].map(function (a, v) {
+        return '<button type="button" class="sc-opt" data-v="' + v + '" aria-pressed="' + (ans[i] === v) + '"><span>' + esc(a) + '</span><span class="sc-dot">' + CHECK + '</span></button>';
+      }).join('') + '</div>', '#sc-q');
+    document.getElementById('sc-back').onclick = function () { clearTimeout(advancing); if (step > 0) { step--; question(); } else { startScreen(); } };
+    stage.querySelectorAll('.sc-opt').forEach(function (b) {
+      b.onclick = function () {
+        clearTimeout(advancing);
+        ans[i] = Number(b.dataset.v);
+        stage.querySelectorAll('.sc-opt').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+        // a short pause so the choice is seen before the next question
+        advancing = setTimeout(function () {
+          if (step + 1 < steps().length) { step++; question(); } else { result(); }
+        }, reduce ? 0 : 260);
+      };
+    });
+  }
+
+  function compute() {
+    var list = steps(), got = 0, max = 0;
+    list.forEach(function (i) { got += ans[i]; max += 2; });
+    var score = Math.round(got / max * 100);
+    var b = 0; while (score > BAND_MAX[b]) b++;
+    var risks = list.filter(function (i) { return ans[i] > 0; }).sort(function (a, c) { return ans[c] - ans[a] || a - c; });
+    var code = META.map(function (_, i) { return skipped(i) ? 's' : ans[i]; }).join('');
+    return { score: score, b: b, key: BAND_KEY[b], risks: risks, code: code };
+  }
+
+  function result() {
+    var r = compute(), band = L.bands[r.b], top = r.risks.slice(0, 3), more = r.risks.length - top.length;
+    var SRC = getSrc();
+    if (!tracked) { tracked = true; track('tool_complete', { tool: 'scope-check', score: r.score, band: r.key, answers: r.code, lang: lang }); }
+    var chip = fmt(L.chip, { b: band[0] });
+    // the inquiry form's hidden fields carry the score, the answers, the language and the visit source
+    var href = D.form + '?case=' + encodeURIComponent('scope-check-' + r.score + '-' + r.code + '-' + lang) + (SRC ? '&src=' + encodeURIComponent(SRC) : '');
+    show('<h2 class="visually-hidden" id="sc-rt" tabindex="-1">' + L.rlabel + ' ' + r.score + '/100, ' + esc(chip) + '</h2>' +
+      '<div class="sc-risk" data-b="' + r.key + '">' +
+      '<p class="sc-rlabel">' + L.rlabel + '</p>' +
+      '<div class="sc-score" aria-hidden="true"><b>' + r.score + '</b><small>/ 100</small><span class="sc-band">' + ICON[r.key] + esc(chip) + '</span></div>' +
+      '<div class="sc-scale" aria-hidden="true"><div class="sc-bar"><i id="sc-fill"></i></div><div class="sc-ends"><span>' + L.ends[0] + '</span><span>' + L.ends[1] + '</span><span>' + L.ends[2] + '</span></div></div>' +
+      '<p class="sc-verdict">' + band[1] + '</p></div>' +
+      '<div class="sc-todo"><h3>' + L.todoH + '</h3>' +
+      (top.length ? '<ol>' + top.map(function (i) {
+        return '<li><span class="sc-act">' + esc(L.q[i][2]) + '</span><span class="sc-why">' + esc(L.q[i][3]) + '</span></li>';
+      }).join('') + '</ol>' : '<p class="sc-none">' + L.none + '</p>') +
+      (more > 0 ? '<p class="sc-more">' + fmt(L.more, { n: more }) + '</p>' : '') + '</div>' +
+      '<div class="sc-cta"><a class="sc-btn sc-block" id="sc-send" href="' + href + '" target="_blank" rel="noopener" aria-label="' + esc(band[2] + ' (' + L.newWin + ')') + '">' + band[2] + ' <span aria-hidden="true">↗</span></a>' +
+      '<p class="sc-sub">' + band[3] + '</p>' +
+      '<div class="sc-links"><a class="sc-link" href="' + D.book + '" target="_blank" rel="noopener" aria-label="' + esc(L.book + ' (' + L.newWin + ')') + '"><span class="sc-t">' + L.book + '</span><span class="sc-ic" aria-hidden="true">↗</span></a>' +
+      '<button type="button" class="sc-link" id="sc-copy"><span class="sc-t" id="sc-copy-t">' + L.copy + '</span></button>' +
+      '<button type="button" class="sc-link" id="sc-again"><span class="sc-t">' + L.again + '</span></button></div></div>' +
+      '<p class="sc-note">' + L.note + '</p>', '#sc-rt');
+    // the bar fills from 0 to the score once the result is shown
+    var fill = document.getElementById('sc-fill');
+    requestAnimationFrame(function () { requestAnimationFrame(function () { fill.style.width = r.score + '%'; }); });
+    document.getElementById('sc-send').onclick = function () { track('inquiry_click', { location: 'tool', case: 'scope-check', band: r.key, lang: lang, src: SRC || 'none' }); };
+    document.getElementById('sc-again').onclick = function () { ans = META.map(function () { return null; }); tracked = false; step = 0; question(); };
+    document.getElementById('sc-copy').onclick = function () {
+      var b = document.getElementById('sc-copy-t');
+      var text = L.title + '\n' + L.rlabel + ' ' + r.score + '/100 (' + chip + ', ' + L.ends[1] + ')\n\n' + L.todoH + '\n' +
+        top.map(function (i, n) { return (n + 1) + '. ' + L.q[i][2] + ' ' + L.q[i][3]; }).join('\n') + '\n\n' + location.href.split('?')[0].split('#')[0];
+      function done(msg) { b.textContent = msg; setTimeout(function () { b.textContent = L.copy; }, 1800); }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { done(L.copied); }, function () { done(L.copyFail); });
+      } else { done(L.copyFail); }
+    };
+  }
+
+  root.classList.add('is-ready');
+  bindStart();
+})();
