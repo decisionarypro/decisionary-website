@@ -207,8 +207,8 @@
     // the inquiry form's hidden fields carry the score, the answers, the language and the visit source
     var href = D.form + '?case=' + encodeURIComponent('scope-check-' + r.score + '-' + r.code + '-' + lang) + (SRC ? '&src=' + encodeURIComponent(SRC) : '');
     show('<h2 class="visually-hidden" id="sc-rt" tabindex="-1">' + L.rlabel + ' ' + r.score + '/100, ' + esc(chip) + '</h2>' +
-      // someone opened a colleague's result link: say so, and offer their own check first
-      (shared ? '<div class="sc-shared"><p>' + L.shBanner + '</p><button type="button" class="sc-rbtn sc-rgo" id="sc-mine">' + L.shStart + '</button></div>' : '') +
+      // someone opened a result link: one line saying this is a shared result
+      (shared ? '<div class="sc-shared"><p>' + L.shBanner + '</p></div>' : '') +
       '<div class="sc-risk" data-b="' + r.key + '">' +
       '<p class="sc-rlabel">' + L.rlabel + '</p>' +
       '<div class="sc-score" aria-hidden="true"><b>' + r.score + '</b><small>/ 100</small><span class="sc-band">' + ICON[r.key] + esc(chip) + '</span></div>' +
@@ -241,10 +241,11 @@
     // back to the site: similar projects led by the founder (tool → site traffic)
     var cases = document.getElementById('sc-cases');
     if (cases) cases.onclick = function () { track('tool_to_site_click', { tool: 'scope-check', to: 'cases', band: r.key, lang: lang }); };
-    function restart() { ans = META.map(function () { return null; }); tracked = false; shared = false; setHash(''); step = 0; question(); }
-    document.getElementById('sc-again').onclick = restart;
-    var mine = document.getElementById('sc-mine');
-    if (mine) mine.onclick = function () { track('tool_start', { tool: 'scope-check', lang: lang, from: 'shared' }); restart(); };
+    // "start over" from a shared result is the recipient starting their own check, which the viral count needs
+    document.getElementById('sc-again').onclick = function () {
+      if (shared) track('tool_start', { tool: 'scope-check', lang: lang, from: 'shared' });
+      ans = META.map(function () { return null; }); tracked = false; shared = false; setHash(''); step = 0; question();
+    };
     // share the result link: the phone's share sheet (KakaoTalk, LINE, Zalo, WhatsApp …) or a copied link on a computer
     document.getElementById('sc-share').onclick = function () {
       var url = resultUrl(r.code, 'share'), b = document.getElementById('sc-share-t');
