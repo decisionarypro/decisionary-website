@@ -1,0 +1,21 @@
+# Daily site check. A failed run sends the usual GitHub failure email to the repo owner.
+# Note: GitHub pauses scheduled workflows after 60 days without commits; re-enable in the Actions tab if that happens.
+name: site-check
+on:
+  schedule:
+    - cron: '0 22 * * *'   # 07:00 KST
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/scripts
+      - name: Check pages, links, preview images
+        env:
+          EXTRA_URLS: ''   # add the AI model schedule address once it is live
+        run: python3 .github/scripts/site_check.py https://decisionarypro.com
