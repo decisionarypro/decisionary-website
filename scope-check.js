@@ -57,7 +57,7 @@
   }
   function reportText(r) {
     var band = L.bands[r.b], top = r.risks.slice(0, 3), more = r.risks.length - top.length, t = [];
-    t.push('[' + L.title + ']' + (projName ? ' ' + projName : ''), L.repDate + ': ' + today());
+    t.push('[' + L.title + ']', L.repDate + ': ' + today());
     t.push('', '■ ' + L.repSum, L.rlabel + ' ' + r.score + '/100 (' + fmt(L.chip, { b: band[0] }) + ', ' + L.ends[1] + ')', strip(band[1]));
     t.push('', '■ ' + L.todoH);
     if (top.length) top.forEach(function (i, n) { t.push((n + 1) + '. ' + L.q[i][2], '   - ' + L.q[i][3]); });
@@ -188,11 +188,12 @@
       }).join('') + '</ol>' : '<p class="sc-none">' + L.none + '</p>') +
       (more > 0 ? '<p class="sc-more">' + fmt(L.more, { n: more }) + '</p>' : '') + '</div>' +
       '<div class="sc-rep"><h3>' + L.repH + '</h3><p class="sc-rdesc">' + L.repDesc + '</p>' +
-      '<label class="sc-rlab" for="sc-rname">' + L.repName + '</label>' +
-      '<input class="sc-rin" id="sc-rname" type="text" maxlength="60" autocomplete="off" enterkeyhint="done" placeholder="' + esc(L.repPh) + '" value="' + esc(projName) + '">' +
       '<div class="sc-rbtns"><button type="button" class="sc-rbtn" id="sc-rcopy"><span id="sc-rcopy-t">' + L.repCopy + '</span></button>' +
-      '<button type="button" class="sc-rbtn" id="sc-rpdf">' + L.repPdf + '</button></div>' +
-      '<p class="sc-rfine">' + L.repFine + '</p></div>' +
+      '<button type="button" class="sc-rbtn" id="sc-rdoc" aria-expanded="false" aria-controls="sc-rdocp">' + L.repDoc + '</button></div>' +
+      '<div class="sc-rdoc" id="sc-rdocp" hidden><label class="sc-rlab" for="sc-rname">' + L.repName + '</label>' +
+      '<div class="sc-rrow"><input class="sc-rin" id="sc-rname" type="text" maxlength="60" autocomplete="off" enterkeyhint="done" placeholder="' + esc(L.repPh) + '" value="' + esc(projName) + '">' +
+      '<button type="button" class="sc-rbtn sc-rgo" id="sc-rpdf">' + L.repPdf + '</button></div>' +
+      '<p class="sc-rfine">' + L.repFine + '</p></div></div>' +
       '<div class="sc-cta"><a class="sc-btn sc-block" id="sc-send" href="' + href + '" target="_blank" rel="noopener" aria-label="' + esc(band[2] + ' (' + L.newWin + ')') + '">' + band[2] + ' <span aria-hidden="true">↗</span></a>' +
       '<p class="sc-sub">' + band[3] + '</p>' +
       '<div class="sc-links"><a class="sc-link" href="' + D.book + '" target="_blank" rel="noopener" aria-label="' + esc(L.book + ' (' + L.newWin + ')') + '"><span class="sc-t">' + L.book + '</span><span class="sc-ic" aria-hidden="true">↗</span></a>' +
@@ -210,14 +211,21 @@
     // internal report: the project name stays in this page (kept for "start over"), only band and language are counted
     var nameIn = document.getElementById('sc-rname');
     nameIn.oninput = function () { projName = nameIn.value.trim(); };
-    nameIn.onkeydown = function (e) { if (e.key === 'Enter') nameIn.blur(); };
-    function used() { return { band: r.key, lang: lang, named: projName ? 'yes' : 'no' }; }
     document.getElementById('sc-rcopy').onclick = function () {
       var b = document.getElementById('sc-rcopy-t');
       function done(msg) { b.textContent = msg; setTimeout(function () { b.textContent = L.repCopy; }, 1800); }
-      copyText(reportText(r), function () { done(L.copied); track('report_copy', used()); }, function () { done(L.copyFail); });
+      copyText(reportText(r), function () { done(L.copied); track('report_copy', { band: r.key, lang: lang }); }, function () { done(L.copyFail); });
     };
-    document.getElementById('sc-rpdf').onclick = function () { track('report_pdf', used()); printReport(r); };
+    // "save as document" opens the project-name field; the name is used only in the document
+    var docBtn = document.getElementById('sc-rdoc'), docPanel = document.getElementById('sc-rdocp');
+    docBtn.onclick = function () {
+      var open = docPanel.hidden;
+      docPanel.hidden = !open; docBtn.setAttribute('aria-expanded', String(open));
+      if (open) nameIn.focus();
+    };
+    function savePdf() { track('report_pdf', { band: r.key, lang: lang, named: projName ? 'yes' : 'no' }); printReport(r); }
+    nameIn.onkeydown = function (e) { if (e.key === 'Enter') { e.preventDefault(); savePdf(); } };
+    document.getElementById('sc-rpdf').onclick = savePdf;
   }
 
   root.classList.add('is-ready');
