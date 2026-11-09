@@ -8,6 +8,11 @@
 .sc-rbtn:active{transform:scale(.97)}
 .sc-rbtn[aria-expanded="true"]{border-color:var(--sc-ink)}
 @media (hover:hover) and (pointer:fine){.sc-rbtn:hover{border-color:var(--sc-muted)}}
+.sc-rshare{grid-column:1/-1;border-color:var(--sc-acc);color:var(--sc-acc-ink)}
+@media (hover:hover) and (pointer:fine){.sc-rshare:hover{border-color:var(--sc-acc);background:var(--sc-acc-soft)}}
+/* a colleague's shared result: one line of context and the way to check your own project */
+.sc-shared{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px 16px;margin:0 0 20px;padding:14px 16px;border-radius:14px;background:var(--sc-acc-soft)}
+.sc-shared p{max-width:none;margin:0;font-size:14.5px;font-weight:600;line-height:1.45;color:var(--sc-acc-ink);text-wrap:pretty}
 .sc-rdoc{margin-top:12px}
 .sc-rdoc[hidden]{display:none}
 .sc-rlab{display:block;font-size:13px;font-weight:500;margin:0 0 6px}

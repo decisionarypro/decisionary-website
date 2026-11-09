@@ -47,7 +47,35 @@
     return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
   }
   // a report that travels inside a company links back with its own source tag
-  function toolUrl() { return location.origin + location.pathname + '?src=report'; }
+  // a result link: the answer digits ride after #, which browsers never send to the server
+  function resultUrl(code, src) { return location.origin + location.pathname + '?src=' + src + '#r=' + code; }
+  var shared = false;
+  // opened with answers in the address: #r= is a colleague's shared link, #m= is your own result after a
+  // language switch. Fills the answers and returns 'r' or 'm'; a link that does not fit the questions is ignored.
+  function readShared() {
+    var m = /^#([rm])=([012s]{10})$/.exec(location.hash), i;
+    if (!m) return false;
+    var c = m[2].split('');
+    for (i = 0; i < META.length; i++) ans[i] = c[i] === 's' ? null : Number(c[i]);
+    for (i = 0; i < META.length; i++) {
+      if (skipped(i) ? c[i] !== 's' : c[i] === 's') { ans = META.map(function () { return null; }); return false; }
+    }
+    return m[1];
+  }
+  // keep the result in the address and in the footer language links, so a language switch keeps it
+  function setHash(code, kind) {
+    var h = code ? '#' + kind + '=' + code : '';
+    try { history.replaceState(null, '', location.pathname + location.search + h); } catch (e) {}
+    Array.prototype.forEach.call(document.querySelectorAll('.foot-langs a'), function (a) {
+      var href = a.getAttribute('href') || '';
+      if (href.indexOf('scope-check.html') > -1) a.setAttribute('href', href.split('#')[0] + h);
+    });
+  }
+  // the statistics script loads after this one; a shared view on page load waits for it briefly
+  function trackSoon(name, data) {
+    var n = 0;
+    (function t() { if (window.umami && window.umami.track) track(name, data); else if (n++ < 20) setTimeout(t, 250); })();
+  }
   // one row per question; status 0 settled, 1 partly, 2 open, 3 not applicable
   function rows() {
     return META.map(function (m, i) {
@@ -65,7 +93,7 @@
     if (more > 0) t.push(fmt(L.repMore, { n: more }));
     t.push('', '■ ' + L.repAns);
     rows().forEach(function (w) { t.push(w.n + '. [' + w.cat + '] ' + w.q, '   → ' + w.a + ' (' + L.repSt[w.st] + ')'); });
-    t.push('', '※ ' + strip(L.note), L.repBy + ': ' + toolUrl());
+    t.push('', '※ ' + strip(L.note), L.repBy + ': ' + resultUrl(r.code, 'report'));
     return t.join('\n');
   }
   function copyText(text, ok, fail) {
@@ -98,7 +126,7 @@
       rows().map(function (w) {
         return '<tr data-st="' + w.st + '"><td>' + w.n + '</td><td>' + esc(w.cat) + '</td><td>' + esc(w.q) + '</td><td>' + esc(w.a) + '</td><td class="scp-st">' + esc(L.repSt[w.st]) + '</td></tr>';
       }).join('') + '</tbody></table></section>' +
-      '<footer class="scp-f"><p>' + esc(strip(L.note)) + '</p><p>' + esc(L.repBy) + ' · ' + esc(toolUrl()) + '</p></footer>';
+      '<footer class="scp-f"><p>' + esc(strip(L.note)) + '</p><p>' + esc(L.repBy) + ' · ' + esc(resultUrl(r.code, 'report')) + '</p></footer>';
     document.body.appendChild(el);
     // the browser suggests the page title as the PDF file name
     var title = document.title;
@@ -172,11 +200,15 @@
   function result() {
     var r = compute(), band = L.bands[r.b], top = r.risks.slice(0, 3), more = r.risks.length - top.length;
     var SRC = getSrc();
-    if (!tracked) { tracked = true; track('tool_complete', { tool: 'scope-check', score: r.score, band: r.key, answers: r.code, lang: lang }); }
+    if (shared) { if (!tracked) { tracked = true; trackSoon('shared_view', { band: r.key, lang: lang }); } }
+    else if (!tracked) { tracked = true; track('tool_complete', { tool: 'scope-check', score: r.score, band: r.key, answers: r.code, lang: lang }); }
+    setHash(r.code, shared ? 'r' : 'm');
     var chip = fmt(L.chip, { b: band[0] });
     // the inquiry form's hidden fields carry the score, the answers, the language and the visit source
     var href = D.form + '?case=' + encodeURIComponent('scope-check-' + r.score + '-' + r.code + '-' + lang) + (SRC ? '&src=' + encodeURIComponent(SRC) : '');
     show('<h2 class="visually-hidden" id="sc-rt" tabindex="-1">' + L.rlabel + ' ' + r.score + '/100, ' + esc(chip) + '</h2>' +
+      // someone opened a result link: one line saying this is a shared result
+      (shared ? '<div class="sc-shared"><p>' + L.shBanner + '</p></div>' : '') +
       '<div class="sc-risk" data-b="' + r.key + '">' +
       '<p class="sc-rlabel">' + L.rlabel + '</p>' +
       '<div class="sc-score" aria-hidden="true"><b>' + r.score + '</b><small>/ 100</small><span class="sc-band">' + ICON[r.key] + esc(chip) + '</span></div>' +
@@ -194,7 +226,8 @@
       (D.cases ? '<a class="sc-link" id="sc-cases" href="' + D.cases + '"><span class="sc-t">' + L.cases + '</span><span class="sc-ic" aria-hidden="true">→</span></a>' : '') +
       '<button type="button" class="sc-link" id="sc-again"><span class="sc-t">' + L.again + '</span></button></div></div>' +
       '<div class="sc-rep"><h3>' + L.repH + '</h3><p class="sc-rdesc">' + L.repDesc + '</p>' +
-      '<div class="sc-rbtns"><button type="button" class="sc-rbtn" id="sc-rcopy"><span id="sc-rcopy-t">' + L.repCopy + '</span></button>' +
+      '<div class="sc-rbtns"><button type="button" class="sc-rbtn sc-rshare" id="sc-share"><span id="sc-share-t">' + L.shBtn + '</span></button>' +
+      '<button type="button" class="sc-rbtn" id="sc-rcopy"><span id="sc-rcopy-t">' + L.repCopy + '</span></button>' +
       '<button type="button" class="sc-rbtn" id="sc-rdoc" aria-expanded="false" aria-controls="sc-rdocp">' + L.repDoc + '</button></div>' +
       '<div class="sc-rdoc" id="sc-rdocp" hidden><label class="sc-rlab" for="sc-rname">' + L.repName + '</label>' +
       '<div class="sc-rrow"><input class="sc-rin" id="sc-rname" type="text" maxlength="60" autocomplete="off" enterkeyhint="done" placeholder="' + esc(L.repPh) + '" value="' + esc(projName) + '">' +
@@ -208,7 +241,23 @@
     // back to the site: similar projects led by the founder (tool → site traffic)
     var cases = document.getElementById('sc-cases');
     if (cases) cases.onclick = function () { track('tool_to_site_click', { tool: 'scope-check', to: 'cases', band: r.key, lang: lang }); };
-    document.getElementById('sc-again').onclick = function () { ans = META.map(function () { return null; }); tracked = false; step = 0; question(); };
+    // "start over" from a shared result is the recipient starting their own check, which the viral count needs
+    document.getElementById('sc-again').onclick = function () {
+      if (shared) track('tool_start', { tool: 'scope-check', lang: lang, from: 'shared' });
+      ans = META.map(function () { return null; }); tracked = false; shared = false; setHash(''); step = 0; question();
+    };
+    // share the result link: the phone's share sheet (KakaoTalk, LINE, Zalo, WhatsApp …) or a copied link on a computer
+    document.getElementById('sc-share').onclick = function () {
+      var url = resultUrl(r.code, 'share'), b = document.getElementById('sc-share-t');
+      var text = L.rlabel + ' ' + r.score + '/100 (' + chip + '). ' + L.shText;
+      function done(msg) { b.textContent = msg; setTimeout(function () { b.textContent = L.shBtn; }, 1800); }
+      var touch = window.matchMedia && matchMedia('(pointer: coarse)').matches;
+      if (touch && navigator.share) {
+        navigator.share({ title: L.title, text: text, url: url }).then(function () { track('share_click', { method: 'share', band: r.key, lang: lang }); }, function () {});
+      } else {
+        copyText(url, function () { done(L.shCopied); track('share_click', { method: 'copy', band: r.key, lang: lang }); }, function () { done(L.copyFail); });
+      }
+    };
     // internal report: the project name stays in this page (kept for "start over"), only band and language are counted
     var nameIn = document.getElementById('sc-rname');
     nameIn.oninput = function () { projName = nameIn.value.trim(); };
@@ -230,5 +279,15 @@
   }
 
   root.classList.add('is-ready');
-  bindStart();
+  function openFromHash() {
+    var kind = readShared();
+    if (!kind) return false;
+    shared = kind === 'r';
+    tracked = !shared; // your own result was already counted when you finished it
+    result();
+    return true;
+  }
+  if (!openFromHash()) bindStart();
+  // another result link pasted into the same tab changes only the # part, so the page does not reload
+  window.addEventListener('hashchange', function () { if (/^#[rm]=/.test(location.hash)) openFromHash(); });
 })();
