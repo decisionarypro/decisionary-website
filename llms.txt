@@ -20,7 +20,7 @@ Last updated: 2026-11-06
 
 ## Free tool
 
-- [Scope check](https://decisionarypro.com/scope-check.html) (also in [한국어](https://decisionarypro.com/ko/scope-check.html), [日本語](https://decisionarypro.com/ja/scope-check.html), [简体中文](https://decisionarypro.com/zh-hans/scope-check.html), [繁體中文](https://decisionarypro.com/zh-hant/scope-check.html), [Tiếng Việt](https://decisionarypro.com/vi/scope-check.html), [ไทย](https://decisionarypro.com/th/scope-check.html), [Bahasa Indonesia](https://decisionarypro.com/id/scope-check.html), [Bahasa Melayu](https://decisionarypro.com/ms/scope-check.html)): ten questions, about two minutes, no sign-up. It returns a 0–100 scope risk score (lower is better) and the three things to settle before asking for a quote.
+- [Project Scope Checklist](https://decisionarypro.com/scope-check.html) (Korean: 외주 견적 체크리스트, Japanese: 発注前チェックリスト; also in [한국어](https://decisionarypro.com/ko/scope-check.html), [日本語](https://decisionarypro.com/ja/scope-check.html), [简体中文](https://decisionarypro.com/zh-hans/scope-check.html), [繁體中文](https://decisionarypro.com/zh-hant/scope-check.html), [Tiếng Việt](https://decisionarypro.com/vi/scope-check.html), [ไทย](https://decisionarypro.com/th/scope-check.html), [Bahasa Indonesia](https://decisionarypro.com/id/scope-check.html), [Bahasa Melayu](https://decisionarypro.com/ms/scope-check.html)): ten questions, about two minutes, no sign-up. It returns a 0–100 scope risk score (lower is better) and the three things to settle before asking for a quote.
 
 ## How an engagement works
 
