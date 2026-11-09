@@ -45,6 +45,7 @@ The website is served by GitHub Pages from `main` / `(root)`. Pushing to `main` 
 
 ## Maintenance notes
 
+- Scope check (`scope-check.html` in en/ko/ja, `scope-check.js`, `scope-check.css`): the result screen can copy an internal-report text or open a print view for "Save as PDF". The report (project name, answers) is built in the page and never sent; only band and language are counted (`report_copy`, `report_pdf`).
 - Case inquiry buttons use `data-form-case`; they open the inquiry form with the case number and industry in its hidden `case` field.
 - There is no lead form, CRM integration, analytics or external ad tracking. Inquiry links use `mailto:`.
 - Update the privacy notice if contact forms, analytics, cookies or third-party processors are added.

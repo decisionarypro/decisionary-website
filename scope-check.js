@@ -39,6 +39,78 @@
   function skipped(i) { var s = META[i].skipIf; return !!s && ans[s.q] === s.v; }
   function steps() { return META.map(function (_, i) { return i; }).filter(function (i) { return !skipped(i); }); }
 
+  // ---- internal report (copy as text / save as PDF). Everything is built in the page; nothing is sent. ----
+  var projName = '';
+  function strip(s) { return String(s).replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, ''); }
+  function today() {
+    var d = new Date(), p = function (n) { return (n < 10 ? '0' : '') + n; };
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+  }
+  // a report that travels inside a company links back with its own source tag
+  function toolUrl() { return location.origin + location.pathname + '?src=report'; }
+  // one row per question; status 0 settled, 1 partly, 2 open, 3 not applicable
+  function rows() {
+    return META.map(function (m, i) {
+      var sk = skipped(i);
+      return { n: i + 1, cat: L.cats[m.cat], q: L.q[i][0], a: sk ? '—' : L.q[i][1][ans[i]], st: sk ? 3 : ans[i] };
+    });
+  }
+  function reportText(r) {
+    var band = L.bands[r.b], top = r.risks.slice(0, 3), more = r.risks.length - top.length, t = [];
+    t.push('[' + L.title + ']', L.repDate + ': ' + today());
+    t.push('', '■ ' + L.repSum, L.rlabel + ' ' + r.score + '/100 (' + fmt(L.chip, { b: band[0] }) + ', ' + L.ends[1] + ')', strip(band[1]));
+    t.push('', '■ ' + L.todoH);
+    if (top.length) top.forEach(function (i, n) { t.push((n + 1) + '. ' + L.q[i][2], '   - ' + L.q[i][3]); });
+    else t.push(strip(L.none));
+    if (more > 0) t.push(fmt(L.repMore, { n: more }));
+    t.push('', '■ ' + L.repAns);
+    rows().forEach(function (w) { t.push(w.n + '. [' + w.cat + '] ' + w.q, '   → ' + w.a + ' (' + L.repSt[w.st] + ')'); });
+    t.push('', '※ ' + strip(L.note), L.repBy + ': ' + toolUrl());
+    return t.join('\n');
+  }
+  function copyText(text, ok, fail) {
+    function legacy() {
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      var done = false; try { done = document.execCommand('copy'); } catch (e) {}
+      ta.remove(); (done ? ok : fail)();
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(ok, legacy);
+    else legacy();
+  }
+  // the printable report lives outside the tool; print CSS (scope-check.css) shows only it while body has .sc-printing
+  function printReport(r) {
+    var band = L.bands[r.b], top = r.risks.slice(0, 3), more = r.risks.length - top.length;
+    var old = document.getElementById('sc-print'); if (old) old.remove();
+    var el = document.createElement('div');
+    el.id = 'sc-print'; el.className = 'sc-print';
+    el.innerHTML = '<header class="scp-h"><p class="scp-k">' + esc(L.title) + '</p><h1>' + esc(projName || L.title) + '</h1>' +
+      '<p class="scp-meta">' + esc(L.repDate) + ' ' + today() + '</p></header>' +
+      '<section><h2>' + esc(L.repSum) + '</h2><p class="scp-score">' + esc(L.rlabel) + ' <b>' + r.score + '</b>/100 · ' + esc(fmt(L.chip, { b: band[0] })) + '</p>' +
+      '<p>' + esc(strip(band[1])) + '</p></section>' +
+      '<section><h2>' + esc(L.todoH) + '</h2>' +
+      (top.length ? '<ol>' + top.map(function (i) { return '<li><b>' + esc(L.q[i][2]) + '</b><br><span class="scp-why">' + esc(L.q[i][3]) + '</span></li>'; }).join('') + '</ol>'
+        : '<p>' + esc(strip(L.none)) + '</p>') +
+      (more > 0 ? '<p class="scp-more">' + esc(fmt(L.repMore, { n: more })) + '</p>' : '') + '</section>' +
+      '<section><h2>' + esc(L.repAns) + '</h2><table><thead><tr><th>#</th>' +
+      L.repCols.map(function (c) { return '<th>' + esc(c) + '</th>'; }).join('') + '</tr></thead><tbody>' +
+      rows().map(function (w) {
+        return '<tr data-st="' + w.st + '"><td>' + w.n + '</td><td>' + esc(w.cat) + '</td><td>' + esc(w.q) + '</td><td>' + esc(w.a) + '</td><td class="scp-st">' + esc(L.repSt[w.st]) + '</td></tr>';
+      }).join('') + '</tbody></table></section>' +
+      '<footer class="scp-f"><p>' + esc(strip(L.note)) + '</p><p>' + esc(L.repBy) + ' · ' + esc(toolUrl()) + '</p></footer>';
+    document.body.appendChild(el);
+    // the browser suggests the page title as the PDF file name
+    var title = document.title;
+    document.title = L.repFile + (projName ? '_' + projName.replace(/[\\\/:*?"<>|]+/g, ' ').trim() : '') + '_' + today();
+    document.body.classList.add('sc-printing');
+    function restore() { document.body.classList.remove('sc-printing'); document.title = title; window.removeEventListener('afterprint', restore); }
+    window.addEventListener('afterprint', restore);
+    // some mobile browsers never fire afterprint; the title comes back after a minute
+    setTimeout(function () { document.title = title; }, 60000);
+    window.print();
+  }
+
   function show(html, focusSel) {
     stage.innerHTML = '<div class="sc-screen">' + html + '</div>';
     var f = focusSel && stage.querySelector(focusSel);
@@ -115,12 +187,19 @@
         return '<li><span class="sc-act">' + esc(L.q[i][2]) + '</span><span class="sc-why">' + esc(L.q[i][3]) + '</span></li>';
       }).join('') + '</ol>' : '<p class="sc-none">' + L.none + '</p>') +
       (more > 0 ? '<p class="sc-more">' + fmt(L.more, { n: more }) + '</p>' : '') + '</div>' +
+      // the inquiry button is the main next step, so it comes before the save panel
       '<div class="sc-cta"><a class="sc-btn sc-block" id="sc-send" href="' + href + '" target="_blank" rel="noopener" aria-label="' + esc(band[2] + ' (' + L.newWin + ')') + '">' + band[2] + ' <span aria-hidden="true">↗</span></a>' +
       '<p class="sc-sub">' + band[3] + '</p>' +
       '<div class="sc-links"><a class="sc-link" href="' + D.book + '" target="_blank" rel="noopener" aria-label="' + esc(L.book + ' (' + L.newWin + ')') + '"><span class="sc-t">' + L.book + '</span><span class="sc-ic" aria-hidden="true">↗</span></a>' +
       (D.cases ? '<a class="sc-link" id="sc-cases" href="' + D.cases + '"><span class="sc-t">' + L.cases + '</span><span class="sc-ic" aria-hidden="true">→</span></a>' : '') +
-      '<button type="button" class="sc-link" id="sc-copy"><span class="sc-t" id="sc-copy-t">' + L.copy + '</span></button>' +
       '<button type="button" class="sc-link" id="sc-again"><span class="sc-t">' + L.again + '</span></button></div></div>' +
+      '<div class="sc-rep"><h3>' + L.repH + '</h3><p class="sc-rdesc">' + L.repDesc + '</p>' +
+      '<div class="sc-rbtns"><button type="button" class="sc-rbtn" id="sc-rcopy"><span id="sc-rcopy-t">' + L.repCopy + '</span></button>' +
+      '<button type="button" class="sc-rbtn" id="sc-rdoc" aria-expanded="false" aria-controls="sc-rdocp">' + L.repDoc + '</button></div>' +
+      '<div class="sc-rdoc" id="sc-rdocp" hidden><label class="sc-rlab" for="sc-rname">' + L.repName + '</label>' +
+      '<div class="sc-rrow"><input class="sc-rin" id="sc-rname" type="text" maxlength="60" autocomplete="off" enterkeyhint="done" placeholder="' + esc(L.repPh) + '" value="' + esc(projName) + '">' +
+      '<button type="button" class="sc-rbtn sc-rgo" id="sc-rpdf">' + L.repPdf + '</button></div>' +
+      '<p class="sc-rfine">' + L.repFine + '</p></div></div>' +
       '<p class="sc-note">' + L.note + '</p>', '#sc-rt');
     // the bar fills from 0 to the score once the result is shown
     var fill = document.getElementById('sc-fill');
@@ -130,15 +209,24 @@
     var cases = document.getElementById('sc-cases');
     if (cases) cases.onclick = function () { track('tool_to_site_click', { tool: 'scope-check', to: 'cases', band: r.key, lang: lang }); };
     document.getElementById('sc-again').onclick = function () { ans = META.map(function () { return null; }); tracked = false; step = 0; question(); };
-    document.getElementById('sc-copy').onclick = function () {
-      var b = document.getElementById('sc-copy-t');
-      var text = L.title + '\n' + L.rlabel + ' ' + r.score + '/100 (' + chip + ', ' + L.ends[1] + ')\n\n' + L.todoH + '\n' +
-        top.map(function (i, n) { return (n + 1) + '. ' + L.q[i][2] + ' ' + L.q[i][3]; }).join('\n') + '\n\n' + location.href.split('?')[0].split('#')[0] + '?src=share';
-      function done(msg) { b.textContent = msg; setTimeout(function () { b.textContent = L.copy; }, 1800); }
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(function () { done(L.copied); }, function () { done(L.copyFail); });
-      } else { done(L.copyFail); }
+    // internal report: the project name stays in this page (kept for "start over"), only band and language are counted
+    var nameIn = document.getElementById('sc-rname');
+    nameIn.oninput = function () { projName = nameIn.value.trim(); };
+    document.getElementById('sc-rcopy').onclick = function () {
+      var b = document.getElementById('sc-rcopy-t');
+      function done(msg) { b.textContent = msg; setTimeout(function () { b.textContent = L.repCopy; }, 1800); }
+      copyText(reportText(r), function () { done(L.copied); track('report_copy', { band: r.key, lang: lang }); }, function () { done(L.copyFail); });
     };
+    // "save as document" opens the project-name field; the name is used only in the document
+    var docBtn = document.getElementById('sc-rdoc'), docPanel = document.getElementById('sc-rdocp');
+    docBtn.onclick = function () {
+      var open = docPanel.hidden;
+      docPanel.hidden = !open; docBtn.setAttribute('aria-expanded', String(open));
+      if (open) nameIn.focus();
+    };
+    function savePdf() { track('report_pdf', { band: r.key, lang: lang, named: projName ? 'yes' : 'no' }); printReport(r); }
+    nameIn.onkeydown = function (e) { if (e.key === 'Enter') { e.preventDefault(); savePdf(); } };
+    document.getElementById('sc-rpdf').onclick = savePdf;
   }
 
   root.classList.add('is-ready');
