@@ -22,6 +22,12 @@
 @media (max-width:560px){.sc-links{gap:0 6px}.sc-link+.sc-link{border-left:0}}
 @media (prefers-reduced-motion:reduce){.sc-rbtn{transition:none}}
 
+/* about this checklist: plain questions and answers under the tool (also FAQPage data for search) */
+.sc-faq{max-width:560px;margin:88px auto 0;padding-top:28px;border-top:1px solid var(--sc-line)}
+.sc-faq h2{font-size:18px;font-weight:600;margin:0 0 4px}
+.sc-faq h3{font-size:15.5px;font-weight:600;line-height:1.5;margin:22px 0 6px;text-wrap:pretty}
+.sc-faq p{max-width:none;margin:0;font-size:14.5px;line-height:1.7;color:var(--sc-muted);text-wrap:pretty}
+
 .sc-print{display:none}
 @media print{
   @page{size:A4;margin:16mm 15mm}
