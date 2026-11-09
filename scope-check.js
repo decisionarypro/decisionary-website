@@ -187,6 +187,12 @@
         return '<li><span class="sc-act">' + esc(L.q[i][2]) + '</span><span class="sc-why">' + esc(L.q[i][3]) + '</span></li>';
       }).join('') + '</ol>' : '<p class="sc-none">' + L.none + '</p>') +
       (more > 0 ? '<p class="sc-more">' + fmt(L.more, { n: more }) + '</p>' : '') + '</div>' +
+      // the inquiry button is the main next step, so it comes before the save panel
+      '<div class="sc-cta"><a class="sc-btn sc-block" id="sc-send" href="' + href + '" target="_blank" rel="noopener" aria-label="' + esc(band[2] + ' (' + L.newWin + ')') + '">' + band[2] + ' <span aria-hidden="true">↗</span></a>' +
+      '<p class="sc-sub">' + band[3] + '</p>' +
+      '<div class="sc-links"><a class="sc-link" href="' + D.book + '" target="_blank" rel="noopener" aria-label="' + esc(L.book + ' (' + L.newWin + ')') + '"><span class="sc-t">' + L.book + '</span><span class="sc-ic" aria-hidden="true">↗</span></a>' +
+      (D.cases ? '<a class="sc-link" id="sc-cases" href="' + D.cases + '"><span class="sc-t">' + L.cases + '</span><span class="sc-ic" aria-hidden="true">→</span></a>' : '') +
+      '<button type="button" class="sc-link" id="sc-again"><span class="sc-t">' + L.again + '</span></button></div></div>' +
       '<div class="sc-rep"><h3>' + L.repH + '</h3><p class="sc-rdesc">' + L.repDesc + '</p>' +
       '<div class="sc-rbtns"><button type="button" class="sc-rbtn" id="sc-rcopy"><span id="sc-rcopy-t">' + L.repCopy + '</span></button>' +
       '<button type="button" class="sc-rbtn" id="sc-rdoc" aria-expanded="false" aria-controls="sc-rdocp">' + L.repDoc + '</button></div>' +
@@ -194,11 +200,6 @@
       '<div class="sc-rrow"><input class="sc-rin" id="sc-rname" type="text" maxlength="60" autocomplete="off" enterkeyhint="done" placeholder="' + esc(L.repPh) + '" value="' + esc(projName) + '">' +
       '<button type="button" class="sc-rbtn sc-rgo" id="sc-rpdf">' + L.repPdf + '</button></div>' +
       '<p class="sc-rfine">' + L.repFine + '</p></div></div>' +
-      '<div class="sc-cta"><a class="sc-btn sc-block" id="sc-send" href="' + href + '" target="_blank" rel="noopener" aria-label="' + esc(band[2] + ' (' + L.newWin + ')') + '">' + band[2] + ' <span aria-hidden="true">↗</span></a>' +
-      '<p class="sc-sub">' + band[3] + '</p>' +
-      '<div class="sc-links"><a class="sc-link" href="' + D.book + '" target="_blank" rel="noopener" aria-label="' + esc(L.book + ' (' + L.newWin + ')') + '"><span class="sc-t">' + L.book + '</span><span class="sc-ic" aria-hidden="true">↗</span></a>' +
-      (D.cases ? '<a class="sc-link" id="sc-cases" href="' + D.cases + '"><span class="sc-t">' + L.cases + '</span><span class="sc-ic" aria-hidden="true">→</span></a>' : '') +
-      '<button type="button" class="sc-link" id="sc-again"><span class="sc-t">' + L.again + '</span></button></div></div>' +
       '<p class="sc-note">' + L.note + '</p>', '#sc-rt');
     // the bar fills from 0 to the score once the result is shown
     var fill = document.getElementById('sc-fill');
