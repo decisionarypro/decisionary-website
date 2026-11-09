@@ -46,6 +46,7 @@ The website is served by GitHub Pages from `main` / `(root)`. Pushing to `main` 
 ## Maintenance notes
 
 - Scope check (`scope-check.html` in all nine languages, `scope-check.js`, `scope-check.css`, preview images `assets/og/scope-check-<lang>.png`): each language has a search title matched to local queries and a three-question FAQ (FAQPage data). Languages other than en/ko use the English inquiry form unless they have their own.
+- Guides (`/<lang>/guides/<slug>.html`, styles in `guides.css`): articles built from a content JSON with the same frame as the service pages, Article + FAQPage data, and links to the checklist (`?src=guide-<lang>`). First one: `/ja/guides/before-comparing-quotes.html`.
 - Scope check result: the result screen can copy an internal-report text or open a print view for "Save as PDF". The report (project name, answers) is built in the page and never sent; only band and language are counted (`report_copy`, `report_pdf`).
 - Case inquiry buttons use `data-form-case`; they open the inquiry form with the case number and industry in its hidden `case` field.
 - There is no lead form, CRM integration, analytics or external ad tracking. Inquiry links use `mailto:`.
