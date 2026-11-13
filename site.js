@@ -69,15 +69,20 @@
     return 'en';
   }
   function remember(l) { try { localStorage.setItem(STORE, l); } catch (e) {} }
-  // Which language should this visit see? Only explicit choices redirect: ?lang= (old links) or a
-  // language the visitor picked before. The browser language never redirects (search engines must see
-  // the page as it is); it only offers a hint to switch, further below.
+  // Which language should this visit see?
+  // 1. ?lang= (old links) 2. a language URL opened directly (/ko/ ...) is always respected
+  // 3. on English pages: the language the visitor picked before, else the browser language when we have
+  //    that language; browsers in other languages stay on English (the default).
+  // Search engine crawlers are never redirected by browser language: they must see each URL as it is
+  // (Naver's site check flagged the root as a JavaScript redirect on 2026-11-06 because Yeti sends Korean).
   var SAVED = (function () { var s = null; try { s = localStorage.getItem(STORE); } catch (e) {} return LANGS.indexOf(s) > -1 ? s : null; })();
+  var BOT = navigator.webdriver ||
+    /bot|crawl|spider|slurp|yeti|daum|google-|mediapartners|apis-google|feedfetcher|facebookexternalhit|embedly|preview|lighthouse|pagespeed|headless/i.test(navigator.userAgent || '');
   var wantLang = (function () {
     var q = params.get('lang');
     if (LANGS.indexOf(q) > -1) { remember(q); return q; }
     if (PAGE_LANG !== 'en') return PAGE_LANG;
-    return SAVED || PAGE_LANG;
+    return SAVED || (BOT ? PAGE_LANG : browserLang());
   })();
   // only redirect to a language this page actually has (its hreflang alternates); pages that exist in
   // fewer languages (service pages, the scope check, 404) stay as they are instead of landing on a missing URL
