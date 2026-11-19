@@ -2,7 +2,9 @@
 
 > Decisionary (디시저너리) is a custom software development company in Seoul, South Korea. It works with businesses and digital agencies on web applications, platform rebuilds and API integrations. Scope and acceptance criteria are agreed in writing before the build, and the founder leads delivery.
 
-Last updated: 2026-11-06
+Last updated: 2026-11-19
+
+Official website: [Decisionary](https://decisionarypro.com/). Localized company pages: [한국어](https://decisionarypro.com/ko/) and [日本語](https://decisionarypro.com/ja/). Official company profile: [Decisionary on LinkedIn](https://www.linkedin.com/company/decisionarypro/).
 
 ## Who it is for
 
@@ -45,14 +47,13 @@ The results below are from projects the founder led in previous roles and contra
 
 ## Languages
 
-The site is available in English, Korean, Japanese, Simplified and Traditional Chinese, Vietnamese, Thai, Indonesian and Malay. Service pages are in English, Korean and Japanese. Korean: https://decisionarypro.com/ko/ · Japanese: https://decisionarypro.com/ja/
+The site is available in English, Korean, Japanese, Simplified and Traditional Chinese, Vietnamese, Thai, Indonesian and Malay. Service pages are in English, Korean and Japanese.
 
 ## Contact
 
 - Inquiry form: https://tally.so/r/Nqr1lN
 - Book a 30-minute call: https://cal.com/decisionary/project-call
 - Email: hello@decisionarypro.com
-- LinkedIn: https://www.linkedin.com/company/decisionarypro/
 - Crunchbase: https://www.crunchbase.com/organization/decisionary-f530
 - GitHub: https://github.com/decisionarypro
 - Privacy policy: https://decisionarypro.com/privacy.html

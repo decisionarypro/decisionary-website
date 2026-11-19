@@ -69,28 +69,15 @@
     return 'en';
   }
   function remember(l) { try { localStorage.setItem(STORE, l); } catch (e) {} }
-  // Which language should this visit see?
-  // 1. ?lang= (old links) 2. a language URL opened directly (/ko/ ...) is always respected
-  // 3. on English pages: the language the visitor picked before, else the browser language when we have
-  //    that language; browsers in other languages stay on English (the default).
-  // Search engine crawlers are never redirected by browser language: they must see each URL as it is
-  // (Naver's site check flagged the root as a JavaScript redirect on 2026-11-06 because Yeti sends Korean).
+  // Localized URLs remain stable. Only the explicit legacy ?lang= link can redirect.
   var SAVED = (function () { var s = null; try { s = localStorage.getItem(STORE); } catch (e) {} return LANGS.indexOf(s) > -1 ? s : null; })();
-  var BOT = navigator.webdriver ||
-    /bot|crawl|spider|slurp|yeti|daum|google-|mediapartners|apis-google|feedfetcher|facebookexternalhit|embedly|preview|lighthouse|pagespeed|headless/i.test(navigator.userAgent || '');
-  var wantLang = (function () {
-    var q = params.get('lang');
-    if (LANGS.indexOf(q) > -1) { remember(q); return q; }
-    if (PAGE_LANG !== 'en') return PAGE_LANG;
-    return SAVED || (BOT ? PAGE_LANG : browserLang());
-  })();
-  // only redirect to a language this page actually has (its hreflang alternates); pages that exist in
-  // fewer languages (service pages, the scope check, 404) stay as they are instead of landing on a missing URL
   var HAS = {};
   Array.prototype.forEach.call(document.querySelectorAll('link[rel="alternate"][hreflang]'), function (l) { HAS[l.getAttribute('hreflang')] = true; });
-  if ((wantLang !== PAGE_LANG || params.has('lang')) && HAS[wantLang]) {
-    var next = localeUrl(wantLang);
-    if (next !== location.pathname + location.search + location.hash) { location.replace(next); return; }
+  var requestedLanguage = params.get('lang');
+  if (LANGS.indexOf(requestedLanguage) > -1 && HAS[requestedLanguage]) {
+    remember(requestedLanguage);
+    location.replace(localeUrl(requestedLanguage));
+    return;
   }
 
   // ---------- language hint: the browser prefers another language this page has ----------
@@ -106,8 +93,8 @@
     ms: ['Halaman ini tersedia dalam Bahasa Melayu.', 'Lihat dalam Bahasa Melayu', 'Tutup']
   };
   (function () {
-    var b = browserLang();
-    if (SAVED || params.has('lang') || b === PAGE_LANG || !HAS[b] || !HINT[b]) return;
+    var b = SAVED || browserLang();
+    if (params.has('lang') || b === PAGE_LANG || !HAS[b] || !HINT[b]) return;
     var t = HINT[b], box = document.createElement('div');
     box.className = 'lang-hint';
     box.setAttribute('role', 'region');

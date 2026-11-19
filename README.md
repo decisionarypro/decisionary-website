@@ -11,10 +11,10 @@ English is the default language; the site is also available in Korean, Japanese,
 - `index.html` — homepage: hero, track record (founder line, outcome figures, six project cells with detail panels), services, who does what, what we agree before starting, process, FAQ and contact
 - `cases.html` — case studies page: six projects led by the founder (overview, challenge, contribution, outcomes) with per-case inquiry links
 - `privacy.html` — privacy information
-- `ko/`, `ja/`, `zh-hans/`, `zh-hant/`, `vi/`, `th/`, `id/`, `ms/` — the same three pages pre-rendered in each language (generated)
+- `ko/`, `ja/`, `zh-hans/`, `zh-hant/`, `vi/`, `th/`, `id/`, `ms/` — localized static home, case studies, privacy and checklist pages, plus service pages and guides where available
 - `i18n/<lang>.json` — translation files the pages are generated from (also kept for reference)
 - `site.css` — design system and layouts, including per-language font and line-height rules
-- `site.js` — language routing (root → saved or browser language), plus all interactions (menu, language menu, project panels, role rings, carousel, contact toggle)
+- `site.js` — explicit language selection and language hints, plus all interactions (menu, language menu, project panels, role rings, carousel, contact toggle)
 - `assets/fonts/` — self-hosted fonts (see the README there)
 - `assets/og/cases.png` — LinkedIn share preview image for the case studies page
 - `favicon.svg`, `CNAME`, `robots.txt`, `sitemap.xml`
@@ -25,8 +25,8 @@ The website is served by GitHub Pages from `main` / `(root)`. Pushing to `main` 
 
 ## Languages
 
-- Every language has its own URLs: English at `/`, others under `/<slug>/` (e.g. `/ko/cases.html`). Each page is static HTML in its language with `<html lang>`, a self-canonical URL and `hreflang` links to all nine versions plus `x-default` (English). `sitemap.xml` lists all 27 URLs.
-- Language choice: a language URL opened directly is always respected. English pages redirect visitors to their saved choice (`localStorage` key `decisionary-lang`) or, without one, to their browser language when the page exists in it; browsers in any other language stay on English (the default). Old `?lang=<code>` links redirect to the matching language URL. Search engine crawlers (bot user agents such as Googlebot and Naver's Yeti, or automated browsers) are never redirected by browser language. Picking a language in the footer or language menu, or closing the language hint, is remembered and overrides the browser language.
+- English uses the root URLs and other languages use their own paths, for example `/ko/cases.html`. Translated pages are static HTML with `<html lang>`, a self-canonical URL, and reciprocal `hreflang` links for the translations that exist. The 52 sitemap URLs include nine versions of each home, case studies, privacy and checklist page, five service pages in English, Korean and Japanese, and a Japanese guide.
+- A direct visit stays on the URL requested. A saved language choice or browser preference can show a language suggestion when the corresponding page exists. The visitor can switch through the suggestion, footer or language menu. Legacy `?lang=<code>` links still redirect to the matching version when it exists.
 - Every key used in the pages must exist in every language file. Japanese and Chinese use full-width punctuation.
 - Japanese, Chinese and Thai use the visitor's system fonts so no large font files are downloaded and no third-party font service is used.
 - Translations other than English and Korean were machine-assisted and should be reviewed by native speakers before relying on them commercially, especially `privacy.html`. For those languages the privacy page notes that the English text prevails.
@@ -45,9 +45,9 @@ The website is served by GitHub Pages from `main` / `(root)`. Pushing to `main` 
 
 ## Maintenance notes
 
-- Scope check (`scope-check.html` in all nine languages, `scope-check.js`, `scope-check.css`, preview images `assets/og/scope-check-<lang>.png`): each language has a search title matched to local queries and a three-question FAQ (FAQPage data). Languages other than en/ko use the English inquiry form unless they have their own.
+- Scope check (`scope-check.html` in all nine languages, `scope-check.js`, `scope-check.css`, preview images `assets/og/scope-check-<lang>.png`): each language has a search title matched to local queries and a three-question FAQ (FAQPage data). English, Korean and Japanese have their own Tally inquiry forms. Other languages use the English form.
 - Guides (`/<lang>/guides/<slug>.html`, styles in `guides.css`): articles built from a content JSON with the same frame as the service pages, Article + FAQPage data, and links to the checklist (`?src=guide-<lang>`). First one: `/ja/guides/before-comparing-quotes.html`.
-- Scope check result: the result screen can copy an internal-report text or open a print view for "Save as PDF". The report (project name, answers) is built in the page and never sent; only band and language are counted (`report_copy`, `report_pdf`).
+- Scope check result: the result screen can copy an internal-report text or open a print view for "Save as PDF". The report is generated in the browser. Shared result links keep answers in the URL fragment. The checklist excludes the fragment from Umami, sends the risk band and language in completion and report events, and passes the risk band and language to Tally when opening the result inquiry.
 - Case inquiry buttons use `data-form-case`; they open the inquiry form with the case number and industry in its hidden `case` field.
-- There is no lead form, CRM integration, analytics or external ad tracking. Inquiry links use `mailto:`.
+- Inquiries use Tally, bookings use Cal.com, and cookie-free website statistics use Umami. Email links use `mailto:`. A visit source tag can be passed to Tally and included in Umami when an inquiry link is clicked.
 - Update the privacy notice if contact forms, analytics, cookies or third-party processors are added.

@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           sparse-checkout: .github/scripts
-      - name: Check pages, links, preview images
+      - name: Check pages, links, search metadata and contact pages
         env:
           EXTRA_URLS: ''   # add the AI model schedule address once it is live
         run: python3 .github/scripts/site_check.py https://decisionarypro.com
