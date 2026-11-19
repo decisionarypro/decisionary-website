@@ -201,11 +201,11 @@
     var r = compute(), band = L.bands[r.b], top = r.risks.slice(0, 3), more = r.risks.length - top.length;
     var SRC = getSrc();
     if (shared) { if (!tracked) { tracked = true; trackSoon('shared_view', { band: r.key, lang: lang }); } }
-    else if (!tracked) { tracked = true; track('tool_complete', { tool: 'scope-check', score: r.score, band: r.key, answers: r.code, lang: lang }); }
+    else if (!tracked) { tracked = true; track('tool_complete', { tool: 'scope-check', band: r.key, lang: lang }); }
     setHash(r.code, shared ? 'r' : 'm');
     var chip = fmt(L.chip, { b: band[0] });
-    // the inquiry form's hidden fields carry the score, the answers, the language and the visit source
-    var href = D.form + '?case=' + encodeURIComponent('scope-check-' + r.score + '-' + r.code + '-' + lang) + (SRC ? '&src=' + encodeURIComponent(SRC) : '');
+    // Pass the result band, language and visit source without including individual answers.
+    var href = D.form + '?case=' + encodeURIComponent('scope-check-' + r.key + '-' + lang) + (SRC ? '&src=' + encodeURIComponent(SRC) : '');
     show('<h2 class="visually-hidden" id="sc-rt" tabindex="-1">' + L.rlabel + ' ' + r.score + '/100, ' + esc(chip) + '</h2>' +
       // someone opened a result link: one line saying this is a shared result
       (shared ? '<div class="sc-shared"><p>' + L.shBanner + '</p></div>' : '') +
@@ -273,7 +273,7 @@
       docPanel.hidden = !open; docBtn.setAttribute('aria-expanded', String(open));
       if (open) nameIn.focus();
     };
-    function savePdf() { track('report_pdf', { band: r.key, lang: lang, named: projName ? 'yes' : 'no' }); printReport(r); }
+    function savePdf() { track('report_pdf', { band: r.key, lang: lang }); printReport(r); }
     nameIn.onkeydown = function (e) { if (e.key === 'Enter') { e.preventDefault(); savePdf(); } };
     document.getElementById('sc-rpdf').onclick = savePdf;
   }
