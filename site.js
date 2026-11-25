@@ -31,6 +31,7 @@
     return (FORMS[cur] || FORMS.en) + (q.length ? '?' + q.join('&') : '');
   }
   var root = document.documentElement;
+  var isHome = document.body.classList.contains('home-page');
   var $ = function (s, c) { return (c || document).querySelector(s); };
   var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
 
@@ -102,7 +103,11 @@
     box.lang = b;
     box.innerHTML = '<p>' + t[0] + '</p><a class="lang-hint-go" href="' + localeUrl(b) + '">' + t[1] + '</a>' +
       '<button type="button" class="lang-hint-x" aria-label="' + t[2] + '"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>';
-    document.body.appendChild(box);
+    if (isHome) {
+      $('.hdr').insertAdjacentElement('afterend', box);
+    } else {
+      document.body.appendChild(box);
+    }
     box.querySelector('.lang-hint-go').addEventListener('click', function () { remember(b); });
     box.querySelector('.lang-hint-x').addEventListener('click', function () { remember(PAGE_LANG); box.remove(); });
   })();
@@ -237,7 +242,7 @@
   function startFx() {
     if (fxStarted) return;
     fxStarted = true;
-    if (reduceMotion || !('IntersectionObserver' in window)) return;
+    if (isHome || reduceMotion || !('IntersectionObserver' in window)) return;
     // Nothing is hidden until the visitor first scrolls or interacts, so the page as loaded (and as
     // crawlers that never scroll render it) always shows every heading and number in full.
     var arm = function () {
@@ -342,7 +347,7 @@
   function scrollMode(e) { return reduceMotion || (e && e.detail === 0) ? 'auto' : 'smooth'; }
   document.addEventListener('click', function (e) {
     var a = e.target.closest('a[href*="#"]');
-    if (!a || e.defaultPrevented || a.classList.contains('skip-link')) return;
+    if (!a || e.defaultPrevented || a.matches('.skip-link, .home-services-link')) return;
     var url = new URL(a.href, location.href);
     if (url.origin !== location.origin || url.pathname !== location.pathname || url.hash.length < 2) return;
     var target = document.getElementById(decodeURIComponent(url.hash.slice(1)));
